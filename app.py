@@ -131,16 +131,45 @@ if st.button("Fetch Keyword Ideas"):
                 # Calculate Quantitative Index
                 all_data = calculate_quantitative_index(all_data, weight_volume, weight_competition, weight_bids)
 
-                # Display the table
-                st.dataframe(all_data)
+                # Store data in session state
+                st.session_state["all_data"] = all_data
 
-                # Download as CSV
-                csv = all_data.to_csv(index=False).encode("utf-8")
-                st.download_button(
-                    label="Download as CSV",
-                    data=csv,
-                    file_name="keyword_ideas.csv",
-                    mime="text/csv",
-                )
-            else:
-                st.write("No data available.")
+if "all_data" in st.session_state:
+    all_data = st.session_state["all_data"]
+
+    # Filter functionality
+    st.write("### Filter Results")
+    filter_keyword = st.text_input("Filter by Keyword (contains):").lower()
+    filter_min_search_volume = st.number_input(
+        "Minimum Search Volume:",
+        min_value=0,
+        value=0,
+        step=1,
+        key="min_search_volume"
+    )
+    filter_max_search_volume = st.number_input(
+        "Maximum Search Volume:",
+        min_value=0,
+        value=int(all_data["Search Volume"].max()),
+        step=1,
+        key="max_search_volume"
+    )
+
+    # Apply filters without rerunning
+    filtered_data = all_data[
+        (all_data["Keyword"].str.lower().str.contains(filter_keyword)) &
+        (all_data["Search Volume"] >= filter_min_search_volume) &
+        (all_data["Search Volume"] <= filter_max_search_volume)
+    ]
+
+    # Display the table
+    st.dataframe(filtered_data)
+
+    # Download filtered data as CSV
+    csv = filtered_data.to_csv(index=False).encode("utf-8")
+    st.download_button(
+        label="Download Filtered Data as CSV",
+        data=csv,
+        file_name="filtered_keyword_ideas.csv",
+        mime="text/csv",
+    )
