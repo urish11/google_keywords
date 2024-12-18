@@ -2,19 +2,15 @@ import streamlit as st
 from google.ads.googleads.client import GoogleAdsClient
 from google.ads.googleads.errors import GoogleAdsException
 import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
 
-
-# Access secrets
+# Google Ads API credentials
 CLIENT_ID = st.secrets["google_ads"]["CLIENT_ID"]
 CLIENT_SECRET = st.secrets["google_ads"]["CLIENT_SECRET"]
 DEVELOPER_TOKEN = st.secrets["google_ads"]["DEVELOPER_TOKEN"]
 REFRESH_TOKEN = st.secrets["google_ads"]["REFRESH_TOKEN"]
 LOGIN_CUSTOMER_ID = st.secrets["google_ads"]["LOGIN_CUSTOMER_ID"]
 CUSTOMER_ID = st.secrets["google_ads"]["CUSTOMER_ID"]
-
-  # Google Ads API credentials
-# Google Ads API credentials
-
 
 def fetch_keyword_data(keyword, location_id, language_id):
     client = GoogleAdsClient.load_from_dict({
@@ -65,8 +61,27 @@ def fetch_keyword_data(keyword, location_id, language_id):
         st.error(f"Error fetching data for keyword '{keyword}': Check your API credentials and parameters.")
         return pd.DataFrame()
 
+def calculate_quantitative_index(df, weight_volume, weight_competition, weight_bids):
+    # Add an Average Bid column
+    df["Average Bid"] = (df["Low Bid ($)"] + df["High Bid ($)"]) / 2
+
+    # Normalize columns
+    columns_to_normalize = ["Search Volume", "Competition Index", "Average Bid"]
+    scaler = MinMaxScaler()
+    normalized_data = scaler.fit_transform(df[columns_to_normalize])
+    normalized_df = pd.DataFrame(normalized_data, columns=[f"Normalized {col}" for col in columns_to_normalize])
+
+    # Calculate the index
+    df["Quantitative Index"] = (
+        normalized_df["Normalized Search Volume"] * weight_volume +
+        normalized_df["Normalized Competition Index"] * weight_competition +
+        normalized_df["Normalized Average Bid"] * weight_bids
+    )
+
+    return df.sort_values(by="Quantitative Index", ascending=False)
+
 # Streamlit App
-st.title("Google Ads Keyword Ideas")
+st.title("Google Ads Keyword Ideas with Custom Weights")
 
 # User input for keywords
 keywords_input = st.text_area("Enter a list of keywords (one per line):")
@@ -74,6 +89,12 @@ keywords_input = st.text_area("Enter a list of keywords (one per line):")
 # User input for location and language
 location_id = st.text_input("Enter Location ID (e.g., 2840 for US):", "2840")
 language_id = st.text_input("Enter Language ID (e.g., 1000 for English):", "1000")
+
+# User input for weights
+st.write("### Set Weights for the Index Calculation")
+weight_volume = st.slider("Weight for Search Volume", 0.0, 1.0, 0.5)
+weight_competition = st.slider("Weight for Competition Index", 0.0, 1.0, 0.3)
+weight_bids = st.slider("Weight for Bid Average", 0.0, 1.0, 0.2)
 
 if st.button("Fetch Keyword Ideas"):
     with st.spinner("Fetching data..."):
@@ -90,7 +111,10 @@ if st.button("Fetch Keyword Ideas"):
                     all_data = pd.concat([all_data, data], ignore_index=True)
 
                 if not all_data.empty:
-                    # Display the merged table
+                    # Calculate Quantitative Index with user-defined weights
+                    all_data = calculate_quantitative_index(all_data, weight_volume, weight_competition, weight_bids)
+
+                    # Display the table
                     sort_by = st.selectbox("Sort by:", all_data.columns, index=1)
                     all_data = all_data.sort_values(by=sort_by, ascending=False)
                     st.dataframe(all_data)
