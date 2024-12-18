@@ -43,7 +43,8 @@ def fetch_keyword_data(keyword, location_id, language_id):
         request.customer_id = CUSTOMER_ID
 
         geo_target = client.get_type("LocationInfo")
-        geo_target.geo_target_constant = f"geoTargetConstants/{location_id}"
+        if location_id is not "":
+            geo_target.geo_target_constant = f"geoTargetConstants/{location_id}"
         request.geo_target_constants.append(geo_target.geo_target_constant)
 
         language = client.get_type("LanguageInfo")
