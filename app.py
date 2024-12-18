@@ -76,8 +76,8 @@ def fetch_keyword_data(keyword, location_id, language_id):
          except GoogleAdsException as ex:
              st.error(f"Error fetching data for keyword '{keyword}': Check your API credentials and parameters.")
              return pd.DataFrame()    
-except:
-     time.sleep(1)
+     except:
+          time.sleep(1)
 
 def calculate_quantitative_index(df, weight_volume, weight_competition, weight_bids):
     # Add an Average Bid column
