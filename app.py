@@ -5,12 +5,7 @@ import pandas as pd
 
 # Google Ads API credentials
 # Google Ads API credentials
-CLIENT_ID = "835888526935-uip4rvqmr25p9gld642v41e5vp8m00f9.apps.googleusercontent.com"
-CLIENT_SECRET = "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"
-DEVELOPER_TOKEN = "ySmNwftLLx94UWuj3niVQQ"
-REFRESH_TOKEN = "1//03SkEQQsqJl9sCgYIARAAGAMSNwF-L9IrmVG8bAEyHrX8Zs4RTzGKeSxHCed328bI9yqD4KhdbMTrpMf4Yoxmy-3jdEEHtZpiiGM"
-LOGIN_CUSTOMER_ID = "3282847251"
-CUSTOMER_ID = "3282847251"
+
 
 def fetch_keyword_data(keyword, location_id, language_id):
     client = GoogleAdsClient.load_from_dict({
