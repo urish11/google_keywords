@@ -128,7 +128,7 @@ if "all_data" in st.session_state:
     # Use AgGrid for interactive filtering and sorting
     st.write("### Interactive Table")
     gb = GridOptionsBuilder.from_dataframe(all_data)
-    gb.configure_pagination(paginationAutoPageSize=True)
+    gb.configure_pagination(paginationPageSize=100)
     gb.configure_default_column(filterable=True, sortable=True, editable=False)
     grid_options = gb.build()
 
