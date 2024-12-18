@@ -132,7 +132,7 @@ if "all_data" in st.session_state:
     gb.configure_default_column(filterable=True, sortable=True, editable=False)
     grid_options = gb.build()
 
-    AgGrid(all_data, gridOptions=grid_options, height=500, theme="light")
+    AgGrid(all_data, gridOptions=grid_options, height=500, theme="streamlit")
 
     csv = all_data.to_csv(index=False).encode("utf-8")
     st.download_button(
