@@ -4,7 +4,13 @@ from google.ads.googleads.errors import GoogleAdsException
 import pandas as pd
 
 
-st.secrets
+# Access secrets
+CLIENT_ID = st.secrets["google_ads"]["CLIENT_ID"]
+CLIENT_SECRET = st.secrets["google_ads"]["CLIENT_SECRET"]
+DEVELOPER_TOKEN = st.secrets["google_ads"]["DEVELOPER_TOKEN"]
+REFRESH_TOKEN = st.secrets["google_ads"]["REFRESH_TOKEN"]
+LOGIN_CUSTOMER_ID = st.secrets["google_ads"]["LOGIN_CUSTOMER_ID"]
+CUSTOMER_ID = st.secrets["google_ads"]["CUSTOMER_ID"]
 
   # Google Ads API credentials
 # Google Ads API credentials
