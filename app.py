@@ -3,7 +3,10 @@ from google.ads.googleads.client import GoogleAdsClient
 from google.ads.googleads.errors import GoogleAdsException
 import pandas as pd
 
-# Google Ads API credentials
+
+st.secrets
+
+  # Google Ads API credentials
 # Google Ads API credentials
 
 
