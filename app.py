@@ -115,7 +115,6 @@ if st.button("Fetch Keyword Ideas"):
                     all_data = calculate_quantitative_index(all_data, weight_volume, weight_competition, weight_bids)
 
                     # Display the table
-                    sort_by = st.selectbox("Sort by:", all_data.columns, index=1)
                     all_data = all_data.sort_values(by=sort_by, ascending=False)
                     st.dataframe(all_data)
 
