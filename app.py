@@ -38,6 +38,7 @@ languages = {
     1013: "Hindi", 1014: "Bengali", 1015: "Turkish", 1016: "Vietnamese"
     # Add the full list from the provided data here...
 }
+
 def fetch_keyword_data(keyword, location_id, language_id):
     try:
         client = GoogleAdsClient.load_from_dict({
@@ -74,9 +75,9 @@ def fetch_keyword_data(keyword, location_id, language_id):
             keywords_data.append({
                 "Keyword": idea.text,
                 "Search Volume": metrics.avg_monthly_searches,
-                "Competition Index": metrics.competition_index,
-                "Low Bid ($)": metrics.low_top_of_page_bid_micros / 1_000_000,
-                "High Bid ($)": metrics.high_top_of_page_bid_micros / 1_000_000,
+                "Competition Index": round(metrics.competition_index, 2),
+                "Low Bid ($)": round(metrics.low_top_of_page_bid_micros / 1_000_000, 2),
+                "High Bid ($)": round(metrics.high_top_of_page_bid_micros / 1_000_000, 2),
             })
 
         return pd.DataFrame(keywords_data)
@@ -100,6 +101,9 @@ def calculate_quantitative_index(df, weight_volume, weight_competition, weight_b
         normalized_df["Normalized Competition Index"] * weight_competition +
         normalized_df["Normalized Average Bid"] * weight_bids
     )
+
+    df["Quantitative Index"] = df["Quantitative Index"].round(2)
+    df["Average Bid"] = df["Average Bid"].round(2)
 
     return df.sort_values(by="Quantitative Index", ascending=False)
 
@@ -126,13 +130,18 @@ def aggregate_by_cluster(data, cluster_data):
         Representative_Keyword=("Keyword", get_representative_phrase),
         Total_Search_Volume=("Search Volume", "sum"),
         Avg_Competition_Index=("Competition Index", "mean"),
-        Total_Quantitative_Index=("Quantitative Index", "sum")
+        Avg_Low_Bid=("Low Bid ($)", "mean"),
+        Avg_High_Bid=("High Bid ($)", "mean"),
+        Avg_Quantitative_Index=("Quantitative Index", "mean")
     ).reset_index()
 
     aggregated_data = aggregated_data[aggregated_data["Cluster"] != -1]
 
     aggregated_data.drop(columns=["Cluster"], inplace=True)
     aggregated_data.rename(columns={"Representative_Keyword": "Key Phrase"}, inplace=True)
+
+    for col in ["Total_Search_Volume", "Avg_Competition_Index", "Avg_Low_Bid", "Avg_High_Bid", "Avg_Quantitative_Index"]:
+        aggregated_data[col] = aggregated_data[col].round(2)
 
     return aggregated_data
 
