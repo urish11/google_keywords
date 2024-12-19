@@ -215,3 +215,10 @@ if "all_data" in st.session_state:
         file_name="keyword_ideas.csv",
         mime="text/csv",
     )
+    csv_cluster = aggregated_table.to_csv(index=False).encode("utf-8")
+    st.download_button(
+        label="Download aggregated_table  CSV",
+        data=csv,
+        file_name="keyword_ideas_agg.csv",
+        mime="text/csv",
+    )
