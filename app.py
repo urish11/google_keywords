@@ -127,24 +127,37 @@ def get_representative_phrase(keywords):
 def aggregate_by_cluster(data, cluster_data):
     data = data.merge(cluster_data, left_on="Keyword", right_on="Keyword")
 
+    # Calculate weighted averages using search volume as weights
+    def weighted_average(group, value_col, weight_col='Search Volume'):
+        return (group[value_col] * group[weight_col]).sum() / group[weight_col].sum()
+
     aggregated_data = data.groupby("Cluster").agg(
         Representative_Keyword=("Keyword", get_representative_phrase),
         Total_Search_Volume=("Search Volume", "sum"),
-        Avg_Competition_Index=("Competition Index", "mean"),
+        Avg_Competition_Index=lambda x: weighted_average(x, 'Competition Index'),
         Avg_Low_Bid=("Low Bid ($)", "mean"),
         Avg_High_Bid=("High Bid ($)", "mean"),
-        Avg_Quantitative_Index=("Quantitative Index", "mean")
+        Avg_Quantitative_Index=lambda x: weighted_average(x, 'Quantitative Index')
     ).reset_index()
 
+    # Filter out noise (cluster -1)
     aggregated_data = aggregated_data[aggregated_data["Cluster"] != -1]
 
+    # Drop the cluster column and rename columns
     aggregated_data.drop(columns=["Cluster"], inplace=True)
-    aggregated_data.rename(columns={"Representative_Keyword": "Key Phrase"}, inplace=True)
+    aggregated_data.rename(columns={
+        "Representative_Keyword": "Key Phrase",
+        "Avg_Competition_Index": "Weighted Avg Competition Index",
+        "Avg_Quantitative_Index": "Weighted Avg Quantitative Index"
+    }, inplace=True)
 
-    for col in ["Total_Search_Volume", "Avg_Competition_Index", "Avg_Low_Bid", "Avg_High_Bid", "Avg_Quantitative_Index"]:
+    # Round numerical columns
+    for col in ["Total_Search_Volume", "Weighted Avg Competition Index", 
+                "Avg_Low_Bid", "Avg_High_Bid", "Weighted Avg Quantitative Index"]:
         aggregated_data[col] = aggregated_data[col].round(2)
 
     return aggregated_data
+
 
 # Streamlit App
 st.set_page_config(layout="wide")
