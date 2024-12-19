@@ -110,7 +110,7 @@ def calculate_quantitative_index(df, weight_volume, weight_competition, weight_b
 
     return df.sort_values(by="Quantitative Index", ascending=False)
 
-def dynamic_keyword_clustering(keywords, ngram_range=(1, 3), eps=1, min_samples=15):
+def dynamic_keyword_clustering(keywords, ngram_range=(1, 3), eps=0.5, min_samples=2):
     vectorizer = TfidfVectorizer(ngram_range=ngram_range, stop_words='english')
     X = vectorizer.fit_transform(keywords)
 
@@ -251,7 +251,7 @@ if "all_data" in st.session_state:
 
     if enable_aggregation:
         # Perform Dynamic Clustering
-        cluster_data = dynamic_keyword_clustering(all_data["Keyword"].tolist(), ngram_range=(2, 3), eps=0.6, min_samples=3)
+        cluster_data = dynamic_keyword_clustering(all_data["Keyword"].tolist(), ngram_range=(2, 3), eps=0.9, min_samples=10)
 
         # Aggregate Data by Clusters
         aggregated_table = aggregate_by_cluster(all_data, cluster_data)
