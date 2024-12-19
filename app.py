@@ -123,7 +123,7 @@ def dynamic_keyword_clustering(keywords, ngram_range=(1, 3), eps=0.5, min_sample
     })
 
 def get_representative_phrase(keywords):
-     stop_words = set(stopwords.words('english'))
+    stop_words = set(stopwords.words('english'))
 
     # Tokenize all keywords in the group and remove stopwords
     tokenized_keywords = [
