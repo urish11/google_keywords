@@ -146,6 +146,8 @@ def aggregate_by_cluster(data, cluster_data):
     return aggregated_data
 
 # Streamlit App
+st.set_page_config(layout="wide")
+
 st.title("Google Ads Keyword Ideas with Quantitative Index")
 
 selected_location = st.selectbox("Select Location:", options=list(locations.keys()), format_func=lambda x: locations[x])
