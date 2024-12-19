@@ -11,6 +11,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import DBSCAN
 import nltk
 import numpy as np
+from collections import Counter
 
 # Ensure NLTK dependencies are downloaded
 nltk.download('punkt')
