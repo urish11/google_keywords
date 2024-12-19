@@ -3,5 +3,4 @@ google-ads
 pandas
 scikit-learn
 streamlit-aggrid
-collections
 nltk
