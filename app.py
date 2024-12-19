@@ -125,7 +125,7 @@ def get_representative_phrase(keywords):
 
 def aggregate_by_cluster(data, cluster_data):
     data = data.merge(cluster_data, left_on="Keyword", right_on="Keyword")
-     print("Columns after merge:", data.columns)
+    print("Columns after merge:", data.columns)
 
 
     # Calculate weighted means for relevant columns
