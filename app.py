@@ -40,49 +40,48 @@ languages = {
 }
 
 def fetch_keyword_data(keyword, location_id, language_id):
-    try:
-        client = GoogleAdsClient.load_from_dict({
+     try:
+          client = GoogleAdsClient.load_from_dict({
             "developer_token": DEVELOPER_TOKEN,
             "client_id": CLIENT_ID,
             "client_secret": CLIENT_SECRET,
             "refresh_token": REFRESH_TOKEN,
             "login_customer_id": LOGIN_CUSTOMER_ID,
             "use_proto_plus": True
-        })
-
-        keyword_plan_idea_service = client.get_service("KeywordPlanIdeaService")
-
-        request = client.get_type("GenerateKeywordIdeasRequest")
-        request.customer_id = CUSTOMER_ID
-
-        geo_target = client.get_type("LocationInfo")
-        geo_target.geo_target_constant = f"geoTargetConstants/{location_id}"
-        request.geo_target_constants.append(geo_target.geo_target_constant)
-
-        language = client.get_type("LanguageInfo")
-        language.language_constant = f"languageConstants/{language_id}"
-        request.language = language.language_constant
-
-        keyword_seed = client.get_type("KeywordSeed")
-        keyword_seed.keywords.extend([keyword])
-        request.keyword_seed = keyword_seed
-
-        response = keyword_plan_idea_service.generate_keyword_ideas(request=request)
-
-        keywords_data = []
-        for idea in response.results:
-             metrics = idea.keyword_idea_metrics
-             if metrics.avg_monthly_searches > 0 and metrics.low_top_of_page_bid_micros > 0 and metrics.high_top_of_page_bid_micros > 0 :
-
-                      keywords_data.append({
-                          "Keyword": idea.text,
-                          "Search Volume": metrics.avg_monthly_searches,
-                          "Competition Index": round(metrics.competition_index, 2),
-                          "Low Bid ($)": round(metrics.low_top_of_page_bid_micros / 1_000_000, 2),
-                          "High Bid ($)": round(metrics.high_top_of_page_bid_micros / 1_000_000, 2),
-                      })
-
-        return pd.DataFrame(keywords_data)
+          })
+          
+          keyword_plan_idea_service = client.get_service("KeywordPlanIdeaService")
+          
+          request = client.get_type("GenerateKeywordIdeasRequest")
+          request.customer_id = CUSTOMER_ID
+          
+          geo_target = client.get_type("LocationInfo")
+          geo_target.geo_target_constant = f"geoTargetConstants/{location_id}"
+          request.geo_target_constants.append(geo_target.geo_target_constant)
+          
+          language = client.get_type("LanguageInfo")
+          language.language_constant = f"languageConstants/{language_id}"
+          request.language = language.language_constant
+          
+          keyword_seed = client.get_type("KeywordSeed")
+          keyword_seed.keywords.extend([keyword])
+          request.keyword_seed = keyword_seed
+          
+          response = keyword_plan_idea_service.generate_keyword_ideas(request=request)
+          
+          keywords_data = []
+          for idea in response.results:
+              metrics = idea.keyword_idea_metrics
+              if metrics.avg_monthly_searches > 0 and metrics.low_top_of_page_bid_micros > 0 and metrics.high_top_of_page_bid_micros > 0:
+                  keywords_data.append({
+                      "Keyword": idea.text,
+                      "Search Volume": metrics.avg_monthly_searches,
+                      "Competition Index": round(metrics.competition_index, 2),
+                      "Low Bid ($)": round(metrics.low_top_of_page_bid_micros / 1_000_000, 2),
+                      "High Bid ($)": round(metrics.high_top_of_page_bid_micros / 1_000_000, 2),
+                  })
+          
+          return pd.DataFrame(keywords_data)
 
     except GoogleAdsException as ex:
         st.error(f"Error fetching data for keyword '{keyword}': Check your API credentials and parameters.")
