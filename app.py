@@ -126,13 +126,15 @@ def get_representative_phrase(keywords):
 def aggregate_by_cluster(data, cluster_data):
     data = data.merge(cluster_data, left_on="Keyword", right_on="Keyword")
 
-    # Check columns to debug
-    print("Columns after merge:", data.columns)
-
     # Calculate weighted means for relevant columns
     def weighted_mean(group, value_column, weight_column):
+        # Check if the group is a Series (this happens when only one column is passed to agg)
+        if isinstance(group, pd.Series):
+            group = group.to_frame()  # Convert to DataFrame
+
         if value_column not in group.columns or weight_column not in group.columns:
             raise KeyError(f"Missing column: {value_column} or {weight_column}")
+        
         return (group[value_column] * group[weight_column]).sum() / group[weight_column].sum()
 
     # Group by Cluster
