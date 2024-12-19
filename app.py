@@ -247,7 +247,7 @@ if "all_data" in st.session_state:
     gb.configure_grid_options(clipboard=True)  # Enable clipboard copy
 
     grid_options = gb.build()
-    AgGrid(all_data, gridOptions=grid_options, height=500, width=700, theme="streamlit")
+    AgGrid(all_data, gridOptions=grid_options, height=800, width=700, theme="streamlit")
 
     if enable_aggregation:
         # Perform Dynamic Clustering
@@ -268,7 +268,7 @@ if "all_data" in st.session_state:
 
 
         grid_options = gb.build()
-        AgGrid(aggregated_table, gridOptions=grid_options, height=500, width=700, theme="streamlit")
+        AgGrid(aggregated_table, gridOptions=grid_options, height=800, width=700, theme="streamlit")
 
     # Download Button for Original Table
     csv = all_data.to_csv(index=False).encode("utf-8")
