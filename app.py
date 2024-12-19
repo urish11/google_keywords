@@ -124,9 +124,12 @@ def dynamic_keyword_clustering(keywords, ngram_range=(1, 3), eps=0.5, min_sample
 
 def get_representative_phrase(keywords_series):
     stop_words = set(stopwords.words('english'))
-
-    # Convert Series to a list if necessary
-    keywords = keywords_series.tolist()
+    
+    # Convert Series to a list and drop any null or empty strings
+    keywords = [kw for kw in keywords_series.dropna().tolist() if kw.strip()]
+    
+    if not keywords:  # If no valid keywords remain
+        return ""
     
     # Tokenize all keywords in the group and remove stopwords
     tokenized_keywords = [
@@ -136,6 +139,10 @@ def get_representative_phrase(keywords_series):
     
     # Flatten the list of tokens
     all_tokens = [token for tokens in tokenized_keywords for token in tokens]
+    
+    # Check if all_tokens is empty
+    if not all_tokens:
+        return min(keywords, key=len)  # Fallback to shortest keyword if no tokens remain
     
     # Identify the most common words in the group
     most_common_words = Counter(all_tokens).most_common()
@@ -148,6 +155,7 @@ def get_representative_phrase(keywords_series):
         return min(keywords, key=len)
     
     return concise_phrase
+
 
 
 def aggregate_by_cluster(data, cluster_data):
