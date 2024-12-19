@@ -124,49 +124,59 @@ def get_representative_phrase(keywords):
     return max(keywords, key=len)
 
 def aggregate_by_cluster(data, cluster_data):
+    # Merge the data
     data = data.merge(cluster_data, left_on="Keyword", right_on="Keyword")
-    print("Columns after merge:", data.columns)
+    
+    # Debug: Print column names
+    print("Available columns:", data.columns.tolist())
 
-
-    # Calculate weighted means for relevant columns
     def weighted_mean(group, value_column, weight_column):
-    # Ensure that group is a DataFrame, not a Series
-         if isinstance(group, pd.Series):
-             group = group.to_frame()  # Convert to DataFrame if it's a Series
-         
-         # Debug: Check the columns and content of the group
-         print(f"Group Columns: {group.columns}")
-         print(f"Group Data:\n{group.head()}")
-     
-         if value_column not in group.columns or weight_column not in group.columns:
-             raise KeyError(f"Missing column: {value_column} or {weight_column}")
-         
-         # Compute the weighted mean
-         return (group[value_column] * group[weight_column]).sum() / group[weight_column].sum()
-
-
+        # Convert group to DataFrame if it's a Series
+        if isinstance(group, pd.Series):
+            group = pd.DataFrame(group)
+        
+        # Debug print
+        print(f"Group columns: {group.columns}")
+        print(f"Looking for columns: {value_column} and {weight_column}")
+        
+        # Check if columns exist
+        if value_column not in group.columns or weight_column not in group.columns:
+            print(f"Group data:\n{group.head()}")
+            raise KeyError(f"Missing column: {value_column} or {weight_column}")
+        
+        weights = group[weight_column]
+        values = group[value_column]
+        return (values * weights).sum() / weights.sum()
 
     # Group by Cluster
-    aggregated_data = data.groupby("Cluster").agg(
-        Representative_Keyword=("Keyword", get_representative_phrase),
-        Total_Search_Volume=("Search Volume", "sum"),
-        Weighted_Competition_Index=("Competition Index", lambda group: weighted_mean(group, "Competition Index", "Search Volume")),
-        Weighted_Low_Bid=("Low Bid ($)", lambda group: weighted_mean(group, "Low Bid ($)", "Search Volume")),
-        Weighted_High_Bid=("High Bid ($)", lambda group: weighted_mean(group, "High Bid ($)", "Search Volume")),
-        Weighted_Quantitative_Index=("Quantitative Index", lambda group: weighted_mean(group, "Quantitative Index", "Search Volume"))
-    ).reset_index()
+    aggregated_data = data.groupby("Cluster").agg({
+        "Keyword": get_representative_phrase,
+        "Search Volume": "sum",
+        "Competition Index": lambda x: weighted_mean(x, "Competition Index", "Search Volume"),
+        "Low Bid ($)": lambda x: weighted_mean(x, "Low Bid ($)", "Search Volume"),
+        "High Bid ($)": lambda x: weighted_mean(x, "High Bid ($)", "Search Volume"),
+        "Quantitative Index": lambda x: weighted_mean(x, "Quantitative Index", "Search Volume")
+    }).reset_index()
 
-    # Remove cluster column and rename representative keyword
+    # Remove noise cluster (-1) and rename columns
     aggregated_data = aggregated_data[aggregated_data["Cluster"] != -1]
-    aggregated_data.drop(columns=["Cluster"], inplace=True)
-    aggregated_data.rename(columns={"Representative_Keyword": "Key Phrase"}, inplace=True)
+    aggregated_data.rename(columns={
+        "Keyword": "Key Phrase",
+        "Search Volume": "Total_Search_Volume",
+        "Competition Index": "Weighted_Competition_Index",
+        "Low Bid ($)": "Weighted_Low_Bid",
+        "High Bid ($)": "Weighted_High_Bid",
+        "Quantitative Index": "Weighted_Quantitative_Index"
+    }, inplace=True)
+    
+    # Round numeric columns
+    numeric_columns = ["Total_Search_Volume", "Weighted_Competition_Index", 
+                      "Weighted_Low_Bid", "Weighted_High_Bid", "Weighted_Quantitative_Index"]
+    for col in numeric_columns:
+        if col in aggregated_data.columns:
+            aggregated_data[col] = aggregated_data[col].round(2)
 
-    # Round columns for cleaner display
-    for col in ["Total_Search_Volume", "Weighted_Competition_Index", "Weighted_Low_Bid", "Weighted_High_Bid", "Weighted_Quantitative_Index"]:
-        aggregated_data[col] = aggregated_data[col].round(2)
-
-    return aggregated_data
-
+    return aggregated_data.drop(columns=["Cluster"])
 
 
 # Streamlit App
