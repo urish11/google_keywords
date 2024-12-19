@@ -124,53 +124,26 @@ def get_representative_phrase(keywords):
     return max(keywords, key=len)
 
 def aggregate_by_cluster(data, cluster_data):
-    # Merge the data
     data = data.merge(cluster_data, left_on="Keyword", right_on="Keyword")
-    
-    # Debug: Print column names
-    print("Available columns:", data.columns.tolist())
 
-    def weighted_mean(series):
-         # Get the corresponding search volume for each value
-         group_data = data[data.index.isin(series.index)]
-         weights = group_data["Search Volume"]
-         # Avoid division by zero
-         total_weight = weights.sum()
-         if total_weight == 0:
-             return 0  # or any default value you prefer
-         return (series * weights).sum() / total_weight
+    aggregated_data = data.groupby("Cluster").agg(
+        Representative_Keyword=("Keyword", get_representative_phrase),
+        Total_Search_Volume=("Search Volume", "sum"),
+        Avg_Competition_Index=("Competition Index", "mean"),
+        Avg_Low_Bid=("Low Bid ($)", "mean"),
+        Avg_High_Bid=("High Bid ($)", "mean"),
+        Avg_Quantitative_Index=("Quantitative Index", "mean")
+    ).reset_index()
 
-
-    # Group by Cluster
-    aggregated_data = data.groupby("Cluster").agg({
-        "Keyword": get_representative_phrase,
-        "Search Volume": "sum",
-        "Competition Index": weighted_mean,
-        "Low Bid ($)": weighted_mean,
-        "High Bid ($)": weighted_mean,
-        "Quantitative Index": weighted_mean
-    }).reset_index()
-
-    # Remove noise cluster (-1) and rename columns
     aggregated_data = aggregated_data[aggregated_data["Cluster"] != -1]
-    aggregated_data.rename(columns={
-        "Keyword": "Key Phrase",
-        "Search Volume": "Total_Search_Volume",
-        "Competition Index": "Weighted_Competition_Index",
-        "Low Bid ($)": "Weighted_Low_Bid",
-        "High Bid ($)": "Weighted_High_Bid",
-        "Quantitative Index": "Weighted_Quantitative_Index"
-    }, inplace=True)
-    
-    # Round numeric columns
-    numeric_columns = ["Total_Search_Volume", "Weighted_Competition_Index", 
-                      "Weighted_Low_Bid", "Weighted_High_Bid", "Weighted_Quantitative_Index"]
-    for col in numeric_columns:
-        if col in aggregated_data.columns:
-            aggregated_data[col] = aggregated_data[col].round(2)
 
-    return aggregated_data.drop(columns=["Cluster"])
+    aggregated_data.drop(columns=["Cluster"], inplace=True)
+    aggregated_data.rename(columns={"Representative_Keyword": "Key Phrase"}, inplace=True)
 
+    for col in ["Total_Search_Volume", "Avg_Competition_Index", "Avg_Low_Bid", "Avg_High_Bid", "Avg_Quantitative_Index"]:
+        aggregated_data[col] = aggregated_data[col].round(2)
+
+    return aggregated_data
 
 # Streamlit App
 st.set_page_config(layout="wide")
