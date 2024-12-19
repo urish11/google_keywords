@@ -130,14 +130,17 @@ def aggregate_by_cluster(data, cluster_data):
 
     # Calculate weighted means for relevant columns
     def weighted_mean(group, value_column, weight_column):
-        # Check if the group is a Series (this happens when only one column is passed to agg)
-        if isinstance(group, pd.Series):
-            group = group.to_frame()  # Convert to DataFrame
+    # Ensure that group is a DataFrame, not a Series
+    if isinstance(group, pd.Series):
+        group = group.to_frame()  # Convert to DataFrame if it's a Series
+    
+    # Check if the columns exist in the group
+    if value_column not in group.columns or weight_column not in group.columns:
+        raise KeyError(f"Missing column: {value_column} or {weight_column}")
+    
+    # Compute the weighted mean
+    return (group[value_column] * group[weight_column]).sum() / group[weight_column].sum()
 
-        if value_column not in group.columns or weight_column not in group.columns:
-            raise KeyError(f"Missing column: {value_column} or {weight_column}")
-        
-        return (group[value_column] * group[weight_column]).sum() / group[weight_column].sum()
 
     # Group by Cluster
     aggregated_data = data.groupby("Cluster").agg(
