@@ -124,7 +124,7 @@ def dynamic_keyword_clustering(keywords, ngram_range=(1, 3), eps=0.5, min_sample
     })
 
 def get_representative_phrase(keywords_series):
-    stop_words = set(stopwords.words('english'))
+    stop_words = set(stopwords.words('english')).union({"best", "accurate", "with", "and", "device", "digital"})  # Add custom stopwords
     
     # Convert Series to a list and drop any null or empty strings
     keywords = [kw for kw in keywords_series.dropna().tolist() if kw.strip()]
@@ -148,14 +148,15 @@ def get_representative_phrase(keywords_series):
     # Identify the most common words in the group
     most_common_words = Counter(all_tokens).most_common()
     
-    # Construct the concise representative phrase using the most frequent tokens
-    concise_phrase = " ".join([word for word, count in most_common_words if count > 1])
+    # Limit phrase length to top 3 most frequent tokens
+    concise_phrase = " ".join([word for word, count in most_common_words[:3]])
     
     # Default to the shortest keyword if no common words are found
     if not concise_phrase:
         return min(keywords, key=len)
     
     return concise_phrase
+
 
 
 
