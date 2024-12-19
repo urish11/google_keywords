@@ -122,9 +122,12 @@ def dynamic_keyword_clustering(keywords, ngram_range=(1, 3), eps=0.5, min_sample
         "Cluster": cluster_labels
     })
 
-def get_representative_phrase(keywords):
+def get_representative_phrase(keywords_series):
     stop_words = set(stopwords.words('english'))
 
+    # Convert Series to a list if necessary
+    keywords = keywords_series.tolist()
+    
     # Tokenize all keywords in the group and remove stopwords
     tokenized_keywords = [
         [word for word in word_tokenize(keyword.lower()) if word not in stop_words]
