@@ -110,7 +110,7 @@ def calculate_quantitative_index(df, weight_volume, weight_competition, weight_b
 
     return df.sort_values(by="Quantitative Index", ascending=False)
 
-def dynamic_keyword_clustering(keywords, ngram_range=(1, 3), eps=0.5, min_samples=2):
+def dynamic_keyword_clustering(keywords, ngram_range=(1, 3), eps=1.5, min_samples=5):
     vectorizer = TfidfVectorizer(ngram_range=ngram_range, stop_words='english')
     X = vectorizer.fit_transform(keywords)
 
