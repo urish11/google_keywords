@@ -184,6 +184,7 @@ if "all_data" in st.session_state:
     gb = GridOptionsBuilder.from_dataframe(all_data)
     gb.configure_pagination(enabled=True,paginationPageSize=100)
     gb.configure_default_column(filterable=True, sortable=True, editable=False)
+    gb.configure_column("Keyword", filter=True)
     grid_options = gb.build()
     AgGrid(all_data, gridOptions=grid_options, height=500, width=700, theme="streamlit")
 
@@ -199,6 +200,9 @@ if "all_data" in st.session_state:
         gb = GridOptionsBuilder.from_dataframe(aggregated_table)
         gb.configure_pagination(enabled=True,paginationPageSize=100)
         gb.configure_default_column(filterable=True, sortable=True, editable=False)
+        gb.configure_column("Keyword", filter=True)
+
+
         grid_options = gb.build()
         AgGrid(aggregated_table, gridOptions=grid_options, height=500, width=700, theme="streamlit")
 
