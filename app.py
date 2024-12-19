@@ -130,7 +130,7 @@ def aggregate_by_cluster(data, cluster_data):
     # Debug: Print column names
     print("Available columns:", data.columns.tolist())
 
-     def weighted_mean(series):
+    def weighted_mean(series):
          # Get the corresponding search volume for each value
          group_data = data[data.index.isin(series.index)]
          weights = group_data["Search Volume"]
