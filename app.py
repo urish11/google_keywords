@@ -185,7 +185,7 @@ if "all_data" in st.session_state:
     gb.configure_pagination(enabled=True,paginationPageSize=100)
     gb.configure_default_column(filterable=True, sortable=True, editable=False)
     grid_options = gb.build()
-    AgGrid(all_data, gridOptions=grid_options, height=1000, width=1000, theme="streamlit")
+    AgGrid(all_data, gridOptions=grid_options, height=500, width=700, theme="streamlit")
 
     if enable_aggregation:
         # Perform Dynamic Clustering
@@ -200,7 +200,7 @@ if "all_data" in st.session_state:
         gb.configure_pagination(enabled=True,paginationPageSize=100)
         gb.configure_default_column(filterable=True, sortable=True, editable=False)
         grid_options = gb.build()
-        AgGrid(aggregated_table, gridOptions=grid_options, height=1000, width=1000, theme="streamlit")
+        AgGrid(aggregated_table, gridOptions=grid_options, height=500, width=700, theme="streamlit")
 
     # Download Button for Original Table
     csv = all_data.to_csv(index=False).encode("utf-8")
