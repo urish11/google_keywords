@@ -251,7 +251,7 @@ if "all_data" in st.session_state:
 
     if enable_aggregation:
         # Perform Dynamic Clustering
-        cluster_data = dynamic_keyword_clustering(all_data["Keyword"].tolist(), ngram_range=(2, 3), eps=0.6, min_samples=4)
+        cluster_data = dynamic_keyword_clustering(all_data["Keyword"].tolist(), ngram_range=(2, 3), eps=0.6, min_samples=5)
 
         # Aggregate Data by Clusters
         aggregated_table = aggregate_by_cluster(all_data, cluster_data)
