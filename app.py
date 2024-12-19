@@ -10,6 +10,7 @@ from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import DBSCAN
 import nltk
+import numpy as np
 
 # Ensure NLTK dependencies are downloaded
 nltk.download('punkt')
