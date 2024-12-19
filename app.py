@@ -86,13 +86,16 @@ if st.button("Fetch Keyword Ideas"):
 if "all_data" in st.session_state:
     all_data = st.session_state["all_data"]
 
-    # Original Table
-    st.write("### Interactive Table")
-    gb = GridOptionsBuilder.from_dataframe(all_data)
+    # Preserve the original table
+    original_table = all_data.copy()
+
+    # Display Original Table
+    st.write("### Interactive Table (Original Data)")
+    gb = GridOptionsBuilder.from_dataframe(original_table)
     gb.configure_pagination(paginationPageSize=100)
     gb.configure_default_column(filterable=True, sortable=True, editable=False)
     grid_options = gb.build()
-    AgGrid(all_data, gridOptions=grid_options, height=500, width=1000, theme="streamlit")
+    AgGrid(original_table, gridOptions=grid_options, height=500, width=1000, theme="streamlit")
 
     if enable_aggregation:
         # Dynamic Keyword Aggregation
@@ -109,7 +112,10 @@ if "all_data" in st.session_state:
                     return token
             return "other"
 
+        # Assign Key Keywords to Rows
         all_data["Key Keyword"] = all_data["Tokens"].apply(map_to_keyword)
+
+        # Aggregate Data Based on Key Keywords
         aggregated_df = all_data.groupby("Key Keyword").agg(
             Total_Search_Volume=("Search Volume", "sum"),
             Avg_Competition_Index=("Competition Index", "mean"),
@@ -117,17 +123,17 @@ if "all_data" in st.session_state:
         ).reset_index()
 
         # Display Aggregated Table
-        st.write("### Aggregated Table")
+        st.write("### Aggregated Table (By Key Keyword)")
         gb = GridOptionsBuilder.from_dataframe(aggregated_df)
         gb.configure_pagination(paginationPageSize=100)
         gb.configure_default_column(filterable=True, sortable=True, editable=False)
         grid_options = gb.build()
         AgGrid(aggregated_df, gridOptions=grid_options, height=500, width=1000, theme="streamlit")
 
-    # Download Button
-    csv = all_data.to_csv(index=False).encode("utf-8")
+    # Download Button for Original Table
+    csv = original_table.to_csv(index=False).encode("utf-8")
     st.download_button(
-        label="Download Data as CSV",
+        label="Download Original Data as CSV",
         data=csv,
         file_name="keyword_ideas.csv",
         mime="text/csv",
