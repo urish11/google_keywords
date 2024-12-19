@@ -134,12 +134,16 @@ def aggregate_by_cluster(data, cluster_data):
          if isinstance(group, pd.Series):
              group = group.to_frame()  # Convert to DataFrame if it's a Series
          
-         # Check if the columns exist in the group
+         # Debug: Check the columns and content of the group
+         print(f"Group Columns: {group.columns}")
+         print(f"Group Data:\n{group.head()}")
+     
          if value_column not in group.columns or weight_column not in group.columns:
              raise KeyError(f"Missing column: {value_column} or {weight_column}")
          
          # Compute the weighted mean
          return (group[value_column] * group[weight_column]).sum() / group[weight_column].sum()
+
 
 
     # Group by Cluster
