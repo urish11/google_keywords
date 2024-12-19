@@ -182,7 +182,7 @@ if "all_data" in st.session_state:
     # Display Original Table
     st.write("### Interactive Table (Original Data)")
     gb = GridOptionsBuilder.from_dataframe(all_data)
-    gb.configure_pagination(paginationPageSize=100)
+    gb.configure_pagination(enabled=True,paginationPageSize=100)
     gb.configure_default_column(filterable=True, sortable=True, editable=False)
     grid_options = gb.build()
     AgGrid(all_data, gridOptions=grid_options, height=500, width=1000, theme="streamlit")
@@ -197,7 +197,7 @@ if "all_data" in st.session_state:
         # Display Aggregated Table
         st.write("### Aggregated Table (By Key Phrase)")
         gb = GridOptionsBuilder.from_dataframe(aggregated_table)
-        gb.configure_pagination(paginationPageSize=100)
+        gb.configure_pagination(enabled=True,paginationPageSize=100)
         gb.configure_default_column(filterable=True, sortable=True, editable=False)
         grid_options = gb.build()
         AgGrid(aggregated_table, gridOptions=grid_options, height=500, width=1000, theme="streamlit")
