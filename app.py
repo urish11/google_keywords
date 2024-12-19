@@ -127,25 +127,24 @@ def get_representative_phrase(keywords):
 def aggregate_by_cluster(data, cluster_data):
     data = data.merge(cluster_data, left_on="Keyword", right_on="Keyword")
 
-    # Define weighted average function
-    def weighted_average(group):
-        weights = group['Search Volume']
-        values = group['Competition Index']
-        return (weights * values).sum() / weights.sum()
-    
-    def weighted_average_quant(group):
-        weights = group['Search Volume']
-        values = group['Quantitative Index']
-        return (weights * values).sum() / weights.sum()
+    def weighted_average(x):
+        return np.average(x, weights=data.loc[x.index, 'Search Volume'])
 
-    aggregated_data = data.groupby("Cluster").agg({
-        'Keyword': get_representative_phrase,
+    # First, get the representative keywords
+    keywords_agg = data.groupby('Cluster')['Keyword'].agg(get_representative_phrase)
+
+    # Then calculate other metrics
+    metrics_agg = data.groupby('Cluster').agg({
         'Search Volume': 'sum',
         'Competition Index': weighted_average,
         'Low Bid ($)': 'mean',
         'High Bid ($)': 'mean',
-        'Quantitative Index': weighted_average_quant
-    }).reset_index()
+        'Quantitative Index': weighted_average
+    })
+
+    # Combine the results
+    aggregated_data = pd.concat([keywords_agg, metrics_agg], axis=1)
+    aggregated_data = aggregated_data.reset_index()
 
     # Filter out noise (cluster -1)
     aggregated_data = aggregated_data[aggregated_data["Cluster"] != -1]
@@ -167,7 +166,6 @@ def aggregate_by_cluster(data, cluster_data):
         aggregated_data[col] = aggregated_data[col].round(2)
 
     return aggregated_data
-
 
 # Streamlit App
 st.set_page_config(layout="wide")
