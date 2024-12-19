@@ -126,24 +126,31 @@ def get_representative_phrase(keywords):
 def aggregate_by_cluster(data, cluster_data):
     data = data.merge(cluster_data, left_on="Keyword", right_on="Keyword")
 
+    # Calculate weighted means for relevant columns
+    def weighted_mean(group, value_column, weight_column):
+        return (group[value_column] * group[weight_column]).sum() / group[weight_column].sum()
+
+    # Group by Cluster
     aggregated_data = data.groupby("Cluster").agg(
         Representative_Keyword=("Keyword", get_representative_phrase),
         Total_Search_Volume=("Search Volume", "sum"),
-        Avg_Competition_Index=("Competition Index", "mean"),
-        Avg_Low_Bid=("Low Bid ($)", "mean"),
-        Avg_High_Bid=("High Bid ($)", "mean"),
-        Avg_Quantitative_Index=("Quantitative Index", "mean")
+        Weighted_Competition_Index=("Competition Index", lambda group: weighted_mean(group, "Competition Index", "Search Volume")),
+        Weighted_Low_Bid=("Low Bid ($)", lambda group: weighted_mean(group, "Low Bid ($)", "Search Volume")),
+        Weighted_High_Bid=("High Bid ($)", lambda group: weighted_mean(group, "High Bid ($)", "Search Volume")),
+        Weighted_Quantitative_Index=("Quantitative Index", lambda group: weighted_mean(group, "Quantitative Index", "Search Volume"))
     ).reset_index()
 
+    # Remove cluster column and rename representative keyword
     aggregated_data = aggregated_data[aggregated_data["Cluster"] != -1]
-
     aggregated_data.drop(columns=["Cluster"], inplace=True)
     aggregated_data.rename(columns={"Representative_Keyword": "Key Phrase"}, inplace=True)
 
-    for col in ["Total_Search_Volume", "Avg_Competition_Index", "Avg_Low_Bid", "Avg_High_Bid", "Avg_Quantitative_Index"]:
+    # Round columns for cleaner display
+    for col in ["Total_Search_Volume", "Weighted_Competition_Index", "Weighted_Low_Bid", "Weighted_High_Bid", "Weighted_Quantitative_Index"]:
         aggregated_data[col] = aggregated_data[col].round(2)
 
     return aggregated_data
+
 
 # Streamlit App
 st.set_page_config(layout="wide")
