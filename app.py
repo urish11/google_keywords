@@ -130,32 +130,20 @@ def aggregate_by_cluster(data, cluster_data):
     # Debug: Print column names
     print("Available columns:", data.columns.tolist())
 
-    def weighted_mean(group, value_column, weight_column):
-        # Convert group to DataFrame if it's a Series
-        if isinstance(group, pd.Series):
-            group = pd.DataFrame(group)
-        
-        # Debug print
-        print(f"Group columns: {group.columns}")
-        print(f"Looking for columns: {value_column} and {weight_column}")
-        
-        # Check if columns exist
-        if value_column not in group.columns or weight_column not in group.columns:
-            print(f"Group data:\n{group.head()}")
-            raise KeyError(f"Missing column: {value_column} or {weight_column}")
-        
-        weights = group[weight_column]
-        values = group[value_column]
-        return (values * weights).sum() / weights.sum()
+    def weighted_mean(series):
+        # Get the corresponding search volume for each value
+        group_data = data[data.index.isin(series.index)]
+        weights = group_data["Search Volume"]
+        return (series * weights).sum() / weights.sum()
 
     # Group by Cluster
     aggregated_data = data.groupby("Cluster").agg({
         "Keyword": get_representative_phrase,
         "Search Volume": "sum",
-        "Competition Index": lambda x: weighted_mean(x, "Competition Index", "Search Volume"),
-        "Low Bid ($)": lambda x: weighted_mean(x, "Low Bid ($)", "Search Volume"),
-        "High Bid ($)": lambda x: weighted_mean(x, "High Bid ($)", "Search Volume"),
-        "Quantitative Index": lambda x: weighted_mean(x, "Quantitative Index", "Search Volume")
+        "Competition Index": weighted_mean,
+        "Low Bid ($)": weighted_mean,
+        "High Bid ($)": weighted_mean,
+        "Quantitative Index": weighted_mean
     }).reset_index()
 
     # Remove noise cluster (-1) and rename columns
