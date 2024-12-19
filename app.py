@@ -71,14 +71,15 @@ def fetch_keyword_data(keyword, location_id, language_id):
 
         keywords_data = []
         for idea in response.results:
-            metrics = idea.keyword_idea_metrics
-            keywords_data.append({
-                "Keyword": idea.text,
-                "Search Volume": metrics.avg_monthly_searches,
-                "Competition Index": round(metrics.competition_index, 2),
-                "Low Bid ($)": round(metrics.low_top_of_page_bid_micros / 1_000_000, 2),
-                "High Bid ($)": round(metrics.high_top_of_page_bid_micros / 1_000_000, 2),
-            })
+             if metrics.avg_monthly_searches > 0:
+                 metrics = idea.keyword_idea_metrics
+                 keywords_data.append({
+                     "Keyword": idea.text,
+                     "Search Volume": metrics.avg_monthly_searches,
+                     "Competition Index": round(metrics.competition_index, 2),
+                     "Low Bid ($)": round(metrics.low_top_of_page_bid_micros / 1_000_000, 2),
+                     "High Bid ($)": round(metrics.high_top_of_page_bid_micros / 1_000_000, 2),
+                 })
 
         return pd.DataFrame(keywords_data)
 
