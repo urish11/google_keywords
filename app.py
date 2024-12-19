@@ -7,7 +7,8 @@ import time
 from st_aggrid import AgGrid, GridOptionsBuilder
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
-from collections import Counter
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.cluster import DBSCAN
 import nltk
 
 # Ensure NLTK dependencies are downloaded
@@ -102,27 +103,36 @@ def calculate_quantitative_index(df, weight_volume, weight_competition, weight_b
 
     return df.sort_values(by="Quantitative Index", ascending=False)
 
-def aggregate_keywords(data):
-    stop_words = set(stopwords.words("english"))
-    data["Tokens"] = data["Keyword"].apply(lambda x: [
-        word.lower() for word in word_tokenize(x) if word.lower() not in stop_words and word.isalnum()
-    ])
+def dynamic_keyword_clustering(keywords, ngram_range=(1, 3), eps=0.5, min_samples=2):
+    vectorizer = TfidfVectorizer(ngram_range=ngram_range, stop_words='english')
+    X = vectorizer.fit_transform(keywords)
 
-    all_tokens = [token for tokens in data["Tokens"] for token in tokens]
-    keyword_counts = Counter(all_tokens)
+    clustering = DBSCAN(eps=eps, min_samples=min_samples, metric='cosine', algorithm='brute').fit(X)
 
-    def map_to_keyword(tokens):
-        for token in tokens:
-            if token in keyword_counts:
-                return token
-        return "other"
+    cluster_labels = clustering.labels_
 
-    data["Key Keyword"] = data["Tokens"].apply(map_to_keyword)
-    aggregated_data = data.groupby("Key Keyword").agg(
+    return pd.DataFrame({
+        "Keyword": keywords,
+        "Cluster": cluster_labels
+    })
+
+def get_representative_phrase(keywords):
+    return max(keywords, key=len)
+
+def aggregate_by_cluster(data, cluster_data):
+    data = data.merge(cluster_data, left_on="Keyword", right_on="Keyword")
+
+    aggregated_data = data.groupby("Cluster").agg(
+        Representative_Keyword=("Keyword", get_representative_phrase),
         Total_Search_Volume=("Search Volume", "sum"),
         Avg_Competition_Index=("Competition Index", "mean"),
         Total_Quantitative_Index=("Quantitative Index", "sum")
     ).reset_index()
+
+    aggregated_data = aggregated_data[aggregated_data["Cluster"] != -1]
+
+    aggregated_data.drop(columns=["Cluster"], inplace=True)
+    aggregated_data.rename(columns={"Representative_Keyword": "Key Phrase"}, inplace=True)
 
     return aggregated_data
 
@@ -158,23 +168,23 @@ if st.button("Fetch Keyword Ideas"):
 if "all_data" in st.session_state:
     all_data = st.session_state["all_data"]
 
-    # Preserve the original table
-    original_table = all_data.copy()
-
     # Display Original Table
     st.write("### Interactive Table (Original Data)")
-    gb = GridOptionsBuilder.from_dataframe(original_table)
+    gb = GridOptionsBuilder.from_dataframe(all_data)
     gb.configure_pagination(paginationPageSize=100)
     gb.configure_default_column(filterable=True, sortable=True, editable=False)
     grid_options = gb.build()
-    AgGrid(original_table, gridOptions=grid_options, height=500, width=1000, theme="streamlit")
+    AgGrid(all_data, gridOptions=grid_options, height=500, width=1000, theme="streamlit")
 
     if enable_aggregation:
-        # Aggregate Keywords
-        aggregated_table = aggregate_keywords(all_data)
+        # Perform Dynamic Clustering
+        cluster_data = dynamic_keyword_clustering(all_data["Keyword"].tolist(), ngram_range=(2, 3), eps=0.5, min_samples=2)
+
+        # Aggregate Data by Clusters
+        aggregated_table = aggregate_by_cluster(all_data, cluster_data)
 
         # Display Aggregated Table
-        st.write("### Aggregated Table")
+        st.write("### Aggregated Table (By Key Phrase)")
         gb = GridOptionsBuilder.from_dataframe(aggregated_table)
         gb.configure_pagination(paginationPageSize=100)
         gb.configure_default_column(filterable=True, sortable=True, editable=False)
@@ -182,7 +192,7 @@ if "all_data" in st.session_state:
         AgGrid(aggregated_table, gridOptions=grid_options, height=500, width=1000, theme="streamlit")
 
     # Download Button for Original Table
-    csv = original_table.to_csv(index=False).encode("utf-8")
+    csv = all_data.to_csv(index=False).encode("utf-8")
     st.download_button(
         label="Download Original Data as CSV",
         data=csv,
