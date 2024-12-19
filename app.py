@@ -186,6 +186,9 @@ if "all_data" in st.session_state:
     gb.configure_pagination(enabled=True,paginationPageSize=100)
     gb.configure_default_column(filterable=True, sortable=True, editable=False)
     gb.configure_column("Keyword", filter=True)
+    gb.configure_grid_options(enableRangeSelection=True)  # Enable range selection
+    gb.configure_grid_options(clipboard=True)  # Enable clipboard copy
+
     grid_options = gb.build()
     AgGrid(all_data, gridOptions=grid_options, height=500, width=700, theme="streamlit")
 
@@ -202,6 +205,9 @@ if "all_data" in st.session_state:
         gb.configure_pagination(enabled=True,paginationPageSize=100)
         gb.configure_default_column(filterable=True, sortable=True, editable=False)
         gb.configure_column("Keyword", filter=True)
+        gb.configure_grid_options(enableRangeSelection=True)  # Enable range selection
+        gb.configure_grid_options(clipboard=True)  # Enable clipboard copy
+
 
 
         grid_options = gb.build()
