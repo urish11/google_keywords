@@ -71,7 +71,7 @@ def fetch_keyword_data(keyword, location_id, language_id):
 
         keywords_data = []
         for idea in response.results:
-             if metrics.avg_monthly_searches > 0:
+             if metrics.avg_monthly_searches > 0 and metrics.low_top_of_page_bid_micros > 0 and metrics.high_top_of_page_bid_micros > 0 :
                  metrics = idea.keyword_idea_metrics
                  keywords_data.append({
                      "Keyword": idea.text,
