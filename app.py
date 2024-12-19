@@ -12,6 +12,7 @@ import nltk
 
 # Ensure NLTK dependencies are downloaded
 nltk.download('punkt')
+nltk.download('punkt_tab')
 nltk.download('stopwords')
 
 # Streamlit App
