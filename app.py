@@ -12,6 +12,7 @@ from sklearn.cluster import DBSCAN
 import nltk
 import numpy as np
 from collections import Counter
+from sklearn.metrics import silhouette_score
 
 # Ensure NLTK dependencies are downloaded
 nltk.download('punkt')
@@ -40,6 +41,45 @@ languages = {
     1013: "Hindi", 1014: "Bengali", 1015: "Turkish", 1016: "Vietnamese"
     # Add the full list from the provided data here...
 }
+
+def optimize_eps(keywords, ngram_range=(1, 3), min_samples=2):
+    vectorizer = TfidfVectorizer(ngram_range=ngram_range, stop_words='english')
+    X = vectorizer.fit_transform(keywords)
+
+    best_eps = None
+    best_score = -1
+    best_labels = None
+
+    for eps in np.arange(0.1, 1.0, 0.1):
+        clustering = DBSCAN(eps=eps, min_samples=min_samples, metric='cosine', algorithm='brute').fit(X)
+        if len(set(clustering.labels_)) > 1:  # Ensure there is more than 1 cluster
+            score = silhouette_score(X, clustering.labels_, metric='cosine')
+            if score > best_score:
+                best_score = score
+                best_eps = eps
+                best_labels = clustering.labels_
+
+    return best_eps, best_labels
+
+def grid_search_clustering(keywords, ngram_range=(1, 3)):
+    vectorizer = TfidfVectorizer(ngram_range=ngram_range, stop_words='english')
+    X = vectorizer.fit_transform(keywords)
+
+    best_params = {}
+    best_score = -1
+    best_labels = None
+
+    for eps in np.arange(0.1, 1.0, 0.1):
+        for min_samples in range(2, 10):
+            clustering = DBSCAN(eps=eps, min_samples=min_samples, metric='cosine', algorithm='brute').fit(X)
+            if len(set(clustering.labels_)) > 1:  # Ensure more than 1 cluster
+                score = silhouette_score(X, clustering.labels_, metric='cosine')
+                if score > best_score:
+                    best_score = score
+                    best_params = {"eps": eps, "min_samples": min_samples}
+                    best_labels = clustering.labels_
+
+    return best_params, best_labels
 
 def fetch_keyword_data(keyword, location_id, language_id):
     try:
@@ -248,13 +288,23 @@ if "all_data" in st.session_state:
 
     grid_options = gb.build()
     AgGrid(all_data, gridOptions=grid_options, height=800, width=700, theme="streamlit")
-
-    if enable_aggregation:
-        # Perform Dynamic Clustering
-        cluster_data = dynamic_keyword_clustering(all_data["Keyword"].tolist(), ngram_range=(2, 3), eps=0.63, min_samples=2)
-
-        # Aggregate Data by Clusters
-        aggregated_table = aggregate_by_cluster(all_data, cluster_data)
+     
+     if enable_aggregation:
+         st.write("### Optimizing Clustering Parameters...")
+         keywords = all_data["Keyword"].tolist()
+         best_params, cluster_labels = grid_search_clustering(keywords, ngram_range=(2, 3))
+     
+         st.write(f"Optimal Parameters: {best_params}")
+     
+         # Perform clustering with optimal parameters
+         clustering = DBSCAN(eps=best_params["eps"], min_samples=best_params["min_samples"], metric='cosine', algorithm='brute')
+         cluster_data = pd.DataFrame({
+             "Keyword": keywords,
+             "Cluster": clustering.fit_predict(TfidfVectorizer(ngram_range=(2, 3), stop_words='english').fit_transform(keywords))
+         })
+     
+         # Aggregate Data by Clusters
+         aggregated_table = aggregate_by_cluster(all_data, cluster_data)
 
         # Display Aggregated Table
         st.write("### Aggregated Table (By Key Phrase)")
