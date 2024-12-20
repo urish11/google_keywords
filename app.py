@@ -289,7 +289,7 @@ if "all_data" in st.session_state:
     grid_options = gb.build()
     AgGrid(all_data, gridOptions=grid_options, height=800, width=700, theme="streamlit")
      
-     if enable_aggregation:
+    if enable_aggregation:
          st.write("### Optimizing Clustering Parameters...")
          keywords = all_data["Keyword"].tolist()
          best_params, cluster_labels = grid_search_clustering(keywords, ngram_range=(2, 3))
