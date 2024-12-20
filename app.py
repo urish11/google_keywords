@@ -367,18 +367,18 @@ if "all_data" in st.session_state:
         grid_options = gb.build()
         AgGrid(aggregated_table, gridOptions=grid_options, height=800, width=700, theme="streamlit")
 
-# Download Button for Original Table
-csv = all_data.to_csv(index=False).encode("utf-8")
-st.download_button(
-    label="Download Original Data as CSV",
-    data=csv,
-    file_name="keyword_ideas.csv",
-    mime="text/csv",
-)
-csv_cluster = aggregated_table.to_csv(index=False).encode("utf-8")
-st.download_button(
-    label="Download aggregated_table  CSV",
-    data=csv,
-    file_name="keyword_ideas_agg.csv",
-    mime="text/csv",
-)
+    # Download Button for Original Table
+    csv = all_data.to_csv(index=False).encode("utf-8")
+    st.download_button(
+        label="Download Original Data as CSV",
+        data=csv,
+        file_name="keyword_ideas.csv",
+        mime="text/csv",
+    )
+    csv_cluster = aggregated_table.to_csv(index=False).encode("utf-8")
+    st.download_button(
+        label="Download aggregated_table  CSV",
+        data=csv,
+        file_name="keyword_ideas_agg.csv",
+        mime="text/csv",
+    )
