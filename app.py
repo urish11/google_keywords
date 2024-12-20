@@ -289,36 +289,36 @@ if "all_data" in st.session_state:
     grid_options = gb.build()
     AgGrid(all_data, gridOptions=grid_options, height=800, width=700, theme="streamlit")
      
-    if enable_aggregation:
-         st.write("### Optimizing Clustering Parameters...")
-         keywords = all_data["Keyword"].tolist()
-         best_params, cluster_labels = grid_search_clustering(keywords, ngram_range=(2, 3))
-     
-         st.write(f"Optimal Parameters: {best_params}")
-     
-         # Perform clustering with optimal parameters
-         clustering = DBSCAN(eps=best_params["eps"], min_samples=best_params["min_samples"], metric='cosine', algorithm='brute')
-         cluster_data = pd.DataFrame({
-             "Keyword": keywords,
-             "Cluster": clustering.fit_predict(TfidfVectorizer(ngram_range=(2, 3), stop_words='english').fit_transform(keywords))
-         })
-     
-         # Aggregate Data by Clusters
-         aggregated_table = aggregate_by_cluster(all_data, cluster_data)
-
-        # Display Aggregated Table
-        st.write("### Aggregated Table (By Key Phrase)")
-        gb = GridOptionsBuilder.from_dataframe(aggregated_table)
-        gb.configure_pagination(enabled=True,paginationPageSize=100)
-        gb.configure_default_column(filterable=True, sortable=True, editable=False)
-        gb.configure_column("Keyword", filter=True)
-        gb.configure_grid_options(enableRangeSelection=True)  # Enable range selection
-        gb.configure_grid_options(clipboard=True)  # Enable clipboard copy
-
-
-
-        grid_options = gb.build()
-        AgGrid(aggregated_table, gridOptions=grid_options, height=800, width=700, theme="streamlit")
+     if enable_aggregation:
+          st.write("### Optimizing Clustering Parameters...")
+          keywords = all_data["Keyword"].tolist()
+          best_params, cluster_labels = grid_search_clustering(keywords, ngram_range=(2, 3))
+          
+          st.write(f"Optimal Parameters: {best_params}")
+          
+          # Perform clustering with optimal parameters
+          clustering = DBSCAN(eps=best_params["eps"], min_samples=best_params["min_samples"], metric='cosine', algorithm='brute')
+          cluster_data = pd.DataFrame({
+          "Keyword": keywords,
+          "Cluster": clustering.fit_predict(TfidfVectorizer(ngram_range=(2, 3), stop_words='english').fit_transform(keywords))
+          })
+          
+          # Aggregate Data by Clusters
+          aggregated_table = aggregate_by_cluster(all_data, cluster_data)
+          
+          # Display Aggregated Table
+          st.write("### Aggregated Table (By Key Phrase)")
+          gb = GridOptionsBuilder.from_dataframe(aggregated_table)
+          gb.configure_pagination(enabled=True,paginationPageSize=100)
+          gb.configure_default_column(filterable=True, sortable=True, editable=False)
+          gb.configure_column("Keyword", filter=True)
+          gb.configure_grid_options(enableRangeSelection=True)  # Enable range selection
+          gb.configure_grid_options(clipboard=True)  # Enable clipboard copy
+          
+          
+          
+          grid_options = gb.build()
+          AgGrid(aggregated_table, gridOptions=grid_options, height=800, width=700, theme="streamlit")
 
     # Download Button for Original Table
     csv = all_data.to_csv(index=False).encode("utf-8")
