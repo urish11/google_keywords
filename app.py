@@ -34,12 +34,19 @@ locations = {
 
 # Full list of languages (Language Name -> Language ID)
 languages = {
-    1000: "English", 1001: "Spanish", 1002: "French", 1003: "German", 1004: "Italian",
-    1005: "Dutch", 1006: "Portuguese", 1007: "Russian", 1008: "Japanese", 1009: "Korean",
-    1010: "Chinese (Simplified)", 1011: "Chinese (Traditional)", 1012: "Arabic",
-    1013: "Hindi", 1014: "Bengali", 1015: "Turkish", 1016: "Vietnamese"
-    # Add the full list from the provided data here...
+    1000: "English", 1001: "German", 1002: "French", 1003: "Spanish", 1004: "Italian",
+    1005: "Japanese", 1009: "Danish", 1010: "Dutch", 1011: "Finnish", 1012: "Korean",
+    1013: "Norwegian", 1014: "Portuguese", 1015: "Swedish", 1017: "Chinese (Simplified)",
+    1018: "Chinese (Traditional)", 1019: "Arabic", 1020: "Bulgarian", 1021: "Czech",
+    1022: "Greek", 1023: "Hindi", 1024: "Hungarian", 1025: "Indonesian", 1026: "Icelandic",
+    1027: "Hebrew", 1028: "Latvian", 1029: "Lithuanian", 1030: "Polish", 1031: "Russian",
+    1032: "Romanian", 1033: "Slovak", 1034: "Slovenian", 1035: "Serbian", 1036: "Ukrainian",
+    1037: "Turkish", 1038: "Catalan", 1039: "Croatian", 1040: "Vietnamese", 1041: "Urdu",
+    1042: "Filipino", 1043: "Estonian", 1044: "Thai", 1056: "Bengali", 1064: "Persian",
+    1072: "Gujarati", 1086: "Kannada", 1098: "Malayalam", 1101: "Marathi", 1102: "Malay",
+    1110: "Punjabi", 1130: "Tamil", 1131: "Telugu"
 }
+
 
 def fetch_keyword_data(keyword, location_id, language_id):
     try:
