@@ -168,32 +168,28 @@ def get_representative_phrase(keywords_series):
 
 
 def aggregate_by_cluster(data, cluster_data):
-    data = data.merge(cluster_data, left_on="Keyword", right_on="Keyword")
+    data = data.merge(cluster_data, on="Keyword", how="left")
 
     def weighted_average(x):
         return np.average(x, weights=data.loc[x.index, 'Search Volume'])
 
-    # First, get the representative keywords
-    keywords_agg = data.groupby('Cluster')['Keyword'].agg(get_representative_phrase)
+    # Get representative phrase for each cluster by ensuring uniqueness
+    keywords_agg = cluster_data.groupby('Cluster')['Keyword'].apply(lambda x: get_representative_phrase(x)).reset_index()
 
-    # Then calculate other metrics
+    # Calculate aggregated metrics
     metrics_agg = data.groupby('Cluster').agg({
         'Search Volume': 'sum',
         'Competition Index': weighted_average,
         'Low Bid ($)': 'mean',
         'High Bid ($)': 'mean',
         'Quantitative Index': weighted_average
-    })
+    }).reset_index()
 
-    # Combine the results
-    aggregated_data = pd.concat([keywords_agg, metrics_agg], axis=1)
-    aggregated_data = aggregated_data.reset_index()
+    # Merge aggregated metrics with representative keywords
+    aggregated_data = pd.merge(metrics_agg, keywords_agg, on='Cluster', how='left')
+    aggregated_data = aggregated_data.dropna(subset=['Keyword'])
 
-    # Filter out noise (cluster -1)
-    aggregated_data = aggregated_data[aggregated_data["Cluster"] != -1]
-
-    # Drop the cluster column and rename columns
-    aggregated_data.drop(columns=["Cluster"], inplace=True)
+    # Rename for output clarity
     aggregated_data.rename(columns={
         'Keyword': 'Key Phrase',
         'Search Volume': 'Total_Search_Volume',
@@ -203,12 +199,16 @@ def aggregate_by_cluster(data, cluster_data):
         'Quantitative Index': 'Weighted Avg Quantitative Index'
     }, inplace=True)
 
+    # Filter out noise
+    aggregated_data = aggregated_data[aggregated_data["Cluster"] != -1]
+
     # Round numerical columns
     for col in ["Total_Search_Volume", "Weighted Avg Competition Index", 
                 "Avg_Low_Bid", "Avg_High_Bid", "Weighted Avg Quantitative Index"]:
         aggregated_data[col] = aggregated_data[col].round(2)
 
     return aggregated_data
+
 
 # Streamlit App
 st.set_page_config(layout="wide")
