@@ -12,6 +12,8 @@ from sklearn.cluster import DBSCAN
 import nltk
 import numpy as np
 from collections import Counter
+from streamlit_modal import Modal
+modal = Modal(key="keywords_modal", title="Cluster Keywords")
 
 # Ensure NLTK dependencies are downloaded
 nltk.download('punkt')
@@ -182,6 +184,13 @@ def aggregate_by_cluster(data, cluster_data):
         .reset_index(name="Cluster Keywords")
     )
 
+    # Truncate the keyword list for table display
+    sorted_keywords["Shortened Keywords"] = sorted_keywords["Cluster Keywords"].apply(
+        lambda x: x[:50] + "..." if len(x) > 50 else x
+    )
+
+    keywords_map = dict(zip(sorted_keywords["Cluster"], sorted_keywords["Cluster Keywords"]))
+
     # Get representative phrase for each cluster by ensuring uniqueness
     keywords_agg = cluster_data.groupby('Cluster')['Keyword'].apply(lambda x: get_representative_phrase(x)).reset_index()
 
@@ -207,7 +216,8 @@ def aggregate_by_cluster(data, cluster_data):
         'Competition Index': 'Weighted Avg Competition Index',
         'Low Bid ($)': 'Avg_Low_Bid',
         'High Bid ($)': 'Avg_High_Bid',
-        'Quantitative Index': 'Weighted Avg Quantitative Index'
+        'Quantitative Index': 'Weighted Avg Quantitative Index',
+        'Shortened Keywords': 'Cluster Keywords'
     }, inplace=True)
 
     # Filter out noise
@@ -218,7 +228,8 @@ def aggregate_by_cluster(data, cluster_data):
                 "Avg_Low_Bid", "Avg_High_Bid", "Weighted Avg Quantitative Index"]:
         aggregated_data[col] = aggregated_data[col].round(2)
 
-    return aggregated_data
+    return aggregated_data, keywords_map
+
 
 
 
@@ -256,51 +267,24 @@ if st.button("Fetch Keyword Ideas"):
 if "all_data" in st.session_state:
     all_data = st.session_state["all_data"]
 
-    # Display Original Table
-    st.write("### Interactive Table (Original Data)")
-    gb = GridOptionsBuilder.from_dataframe(all_data)
-    gb.configure_pagination(enabled=True,paginationPageSize=100)
+    # Perform Dynamic Clustering
+    cluster_data = dynamic_keyword_clustering(all_data["Keyword"].tolist(), ngram_range=(2, 3), eps=0.6, min_samples=2)
+    aggregated_table, keywords_map = aggregate_by_cluster(all_data, cluster_data)
+
+    # Display Aggregated Table
+    st.write("### Aggregated Table (By Key Phrase)")
+    gb = GridOptionsBuilder.from_dataframe(aggregated_table)
+    gb.configure_pagination(enabled=True, paginationPageSize=100)
     gb.configure_default_column(filterable=True, sortable=True, editable=False)
-    gb.configure_column("Keyword", filter=True)
+    gb.configure_column("Cluster Keywords", cellStyle={"cursor": "pointer"})  # Set pointer for clickable column
     gb.configure_grid_options(enableRangeSelection=True)  # Enable range selection
-    gb.configure_grid_options(clipboard=True)  # Enable clipboard copy
-
     grid_options = gb.build()
-    AgGrid(all_data, gridOptions=grid_options, height=800, width=700, theme="streamlit")
 
-    if enable_aggregation:
-        # Perform Dynamic Clustering
-        cluster_data = dynamic_keyword_clustering(all_data["Keyword"].tolist(), ngram_range=(2, 3), eps=0.6, min_samples=2)
+    grid_response = AgGrid(aggregated_table, gridOptions=grid_options, height=800, width=700, theme="streamlit")
 
-        # Aggregate Data by Clusters
-        aggregated_table = aggregate_by_cluster(all_data, cluster_data)
+    # Handle Cell Clicks
+    selected_row = grid_response['selected_rows']
+    if selected_row:
+        cluster_id = selected_row[0]['Cluster']
+        display_keyword_modal(cluster_id, keywords_map)
 
-        # Display Aggregated Table
-        st.write("### Aggregated Table (By Key Phrase)")
-        gb = GridOptionsBuilder.from_dataframe(aggregated_table)
-        gb.configure_pagination(enabled=True,paginationPageSize=100)
-        gb.configure_default_column(filterable=True, sortable=True, editable=False)
-        gb.configure_column("Keyword", filter=True)
-        gb.configure_grid_options(enableRangeSelection=True)  # Enable range selection
-        gb.configure_grid_options(clipboard=True)  # Enable clipboard copy
-
-
-
-        grid_options = gb.build()
-        AgGrid(aggregated_table, gridOptions=grid_options, height=800, width=700, theme="streamlit")
-
-    # Download Button for Original Table
-    csv = all_data.to_csv(index=False).encode("utf-8")
-    st.download_button(
-        label="Download Original Data as CSV",
-        data=csv,
-        file_name="keyword_ideas.csv",
-        mime="text/csv",
-    )
-    csv_cluster = aggregated_table.to_csv(index=False).encode("utf-8")
-    st.download_button(
-        label="Download aggregated_table  CSV",
-        data=csv,
-        file_name="keyword_ideas_agg.csv",
-        mime="text/csv",
-    )
