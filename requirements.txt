@@ -4,3 +4,4 @@ pandas
 scikit-learn
 streamlit-aggrid
 nltk
+streamlit_modal
