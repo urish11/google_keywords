@@ -173,6 +173,15 @@ def aggregate_by_cluster(data, cluster_data):
     def weighted_average(x):
         return np.average(x, weights=data.loc[x.index, 'Search Volume'])
 
+    # Sort keywords by volume within each cluster
+    sorted_keywords = (
+        data.groupby("Cluster")
+        .apply(lambda x: ", ".join(
+            x.sort_values(by="Search Volume", ascending=False)["Keyword"]
+        ))
+        .reset_index(name="Cluster Keywords")
+    )
+
     # Get representative phrase for each cluster by ensuring uniqueness
     keywords_agg = cluster_data.groupby('Cluster')['Keyword'].apply(lambda x: get_representative_phrase(x)).reset_index()
 
@@ -187,7 +196,9 @@ def aggregate_by_cluster(data, cluster_data):
 
     # Merge aggregated metrics with representative keywords
     aggregated_data = pd.merge(metrics_agg, keywords_agg, on='Cluster', how='left')
-    aggregated_data = aggregated_data.dropna(subset=['Keyword'])
+
+    # Merge sorted keywords into aggregated data
+    aggregated_data = pd.merge(aggregated_data, sorted_keywords, on='Cluster', how='left')
 
     # Rename for output clarity
     aggregated_data.rename(columns={
@@ -208,6 +219,7 @@ def aggregate_by_cluster(data, cluster_data):
         aggregated_data[col] = aggregated_data[col].round(2)
 
     return aggregated_data
+
 
 
 # Streamlit App
