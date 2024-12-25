@@ -271,6 +271,10 @@ if "all_data" in st.session_state:
     cluster_data = dynamic_keyword_clustering(all_data["Keyword"].tolist(), ngram_range=(2, 3), eps=0.6, min_samples=2)
     aggregated_table, keywords_map = aggregate_by_cluster(all_data, cluster_data)
 
+    # Handle NaN values and enforce string type
+    aggregated_table.fillna("", inplace=True)
+    aggregated_table = aggregated_table.astype(str)
+
     # Display Aggregated Table
     st.write("### Aggregated Table (By Key Phrase)")
     gb = GridOptionsBuilder.from_dataframe(aggregated_table)
@@ -287,4 +291,5 @@ if "all_data" in st.session_state:
     if selected_row:
         cluster_id = selected_row[0]['Cluster']
         display_keyword_modal(cluster_id, keywords_map)
+
 
