@@ -218,6 +218,19 @@ def aggregate_by_cluster(data, cluster_data):
                 "Avg_Low_Bid", "Avg_High_Bid", "Weighted Avg Quantitative Index"]:
         aggregated_data[col] = aggregated_data[col].round(2)
 
+
+    desired_order = [
+    'Cluster', 
+    'Key Phrase', 
+    'Total_Search_Volume', 
+    'Weighted Avg Competition Index', 
+    'Avg_Low_Bid', 
+    'Avg_High_Bid', 
+    'Weighted Avg Quantitative Index', 
+    'Cluster Keywords'
+        ]
+    aggregated_data = aggregated_data[desired_order]
+
     return aggregated_data
 
 
