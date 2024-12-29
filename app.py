@@ -277,6 +277,7 @@ if "all_data" in st.session_state:
     gb.configure_column("Keyword", filter=True)
     gb.configure_grid_options(enableRangeSelection=True)  # Enable range selection
     gb.configure_grid_options(clipboard=True)  # Enable clipboard copy
+    gb.configure_column("Search Volume", sort="desc")
 
     grid_options = gb.build()
     AgGrid(all_data, gridOptions=grid_options, height=800, width=700, theme="streamlit")
@@ -296,6 +297,7 @@ if "all_data" in st.session_state:
         gb.configure_column("Keyword", filter=True)
         gb.configure_grid_options(enableRangeSelection=True)  # Enable range selection
         gb.configure_grid_options(clipboard=True)  # Enable clipboard copy
+        gb.configure_column("Total_Search_Volume", sort="desc")
 
 
 
