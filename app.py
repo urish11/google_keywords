@@ -101,7 +101,7 @@ def fetch_keyword_data(keyword, location_id, language_id):
 def calculate_quantitative_index(df, weight_volume, weight_competition, weight_bids):
     df["Average Bid"] = (df["Low Bid ($)"] + df["High Bid ($)"]) / 2
 
-    columns_to_normalize = ["Search Volume", "Competition Index", "Average Bid"]
+    columns_to_normalize = ["Search Volume", "Competition Index", "Low Bid"]
     scaler = MinMaxScaler()
     normalized_data = scaler.fit_transform(df[columns_to_normalize])
     normalized_df = pd.DataFrame(normalized_data, columns=[f"Normalized {col}" for col in columns_to_normalize])
