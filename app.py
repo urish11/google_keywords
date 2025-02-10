@@ -276,7 +276,7 @@ if "all_data" in st.session_state:
     gb.configure_default_column(filterable=True, sortable=True, editable=False)
     gb.configure_column("Keyword", filter=True)
     gb.configure_grid_options(enableRangeSelection=True)  # Enable range selection
-            gb.configure_grid_options(pagination=True, paginationPageSize=50, paginationAutoPageSize=False, paginationMode="client")
+    gb.configure_grid_options(pagination=True, paginationPageSize=50, paginationAutoPageSize=False, paginationMode="client")
 
     gb.configure_grid_options(clipboard=True)  # Enable clipboard copy
     gb.configure_column("Search Volume", sort="desc")
