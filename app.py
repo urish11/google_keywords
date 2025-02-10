@@ -272,7 +272,7 @@ if "all_data" in st.session_state:
     # Display Original Table
     st.write("### Interactive Table (Original Data)")
     gb = GridOptionsBuilder.from_dataframe(all_data)
-    gb.configure_pagination(enabled=True,paginationPageSize=8)
+    gb.configure_pagination(enabled=True,paginationPageSize=50)
     gb.configure_default_column(filterable=True, sortable=True, editable=False)
     gb.configure_column("Keyword", filter=True)
     gb.configure_grid_options(enableRangeSelection=True)  # Enable range selection
@@ -296,6 +296,8 @@ if "all_data" in st.session_state:
         gb.configure_default_column(filterable=True, sortable=True, editable=False)
         gb.configure_column("Keyword", filter=True)
         gb.configure_grid_options(enableRangeSelection=True)  # Enable range selection
+        gb.configure_grid_options(pagination=True, paginationPageSize=50)
+
         gb.configure_grid_options(clipboard=True)  # Enable clipboard copy
         gb.configure_column("Total_Search_Volume", sort="desc")
 
