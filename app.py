@@ -47,6 +47,22 @@ languages = {
     1110: "Punjabi", 1130: "Tamil", 1131: "Telugu"
 }
 
+def chatGPT(prompt, model="gpt-4o", temperature=1.0) :
+    st.write("Generating image description...")
+    headers = {
+        'Authorization': f'Bearer {GPT_API_KEY}',
+        'Content-Type': 'application/json'
+    }
+    data = {
+        'model': model,
+        'temperature': temperature,
+        'messages': [{'role': 'user', 'content': prompt}]
+    }
+    response = requests.post('https://api.openai.com/v1/chat/completions', headers=headers, json=data)
+    content = response.json()['choices'][0]['message']['content'].strip()
+    return  content
+
+
 
 def fetch_keyword_data(keyword, location_id, language_id):
     try:
@@ -254,6 +270,15 @@ enable_aggregation = st.checkbox("Enable Dynamic Keyword Aggregation", value=Tru
 if st.button("Fetch Keyword Ideas"):
     with st.spinner("Fetching data..."):
         keywords_input = '\n'.join(set(keywords_input.split('\n')))
+        st.text(keywords_input)
+
+        if st.button("Add KWs via chatGPT?"):
+            gpt_kws = chatGPT(f"write more diverse keywords for search arb with high intent and high CPC, return just the new keywords 
+            each spereted with \n for: {keywords_input}")
+            keywords_input = keywords_input + gpt_kws
+
+            
+        st.text(keywords_input)
 
         keywords = [kw.strip() for kw in keywords_input.splitlines() if kw.strip()]
         if not keywords:
