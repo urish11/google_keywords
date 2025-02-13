@@ -283,7 +283,7 @@ if st.button("Fetch Keyword Ideas"):
             keywords_input = keywords_input +'\n'+ gpt_kws
 
             
-             st.text(keywords_input)
+            st.text(keywords_input)
 
         keywords = [kw.strip() for kw in keywords_input.splitlines() if kw.strip()]
         if not keywords:
