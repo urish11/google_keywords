@@ -270,20 +270,8 @@ weight_bids = st.slider("Weight for Average Bid", 0.0, 1.0, 0.2)
 
 enable_aggregation = st.checkbox("Enable Dynamic Keyword Aggregation", value=True)
 enable_gpt_kws = st.checkbox("Add KWs via chatGPT?", value=False)
-st.markdown(
-    """
-    <style>
-    /* Target number input fields */
-    input[type="number"] {
-        width: 200px !important;  /* Adjust width as needed */
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+count_gpt_kws = st.number_input('How Many GPT KWs?',value = 20)
 
-# Number input with controlled width
-count_gpt_kws = st.number_input("Enter a number:", value=0)
 
 if st.button("Fetch Keyword Ideas"):
     with st.spinner("Fetching data..."):
