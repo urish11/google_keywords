@@ -51,6 +51,7 @@ languages = {
 
 def chatGPT(prompt, model="gpt-4o", temperature=1.0) :
     st.write("Generating image description...")
+    st.text(GPT_API_KEY)
     headers = {
         'Authorization': f'Bearer {GPT_API_KEY}',
         'Content-Type': 'application/json'
@@ -268,7 +269,7 @@ weight_competition = st.slider("Weight for Competition Index", 0.0, 1.0, 0.3)
 weight_bids = st.slider("Weight for Average Bid", 0.0, 1.0, 0.2)
 
 enable_aggregation = st.checkbox("Enable Dynamic Keyword Aggregation", value=True)
-enable_gpt_kws = st.checkbox("Add KWs via chatGPT?", value=True)
+enable_gpt_kws = st.checkbox("Add KWs via chatGPT?", value=False)
 
 
 
