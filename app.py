@@ -12,7 +12,7 @@ from sklearn.cluster import DBSCAN
 import nltk
 import numpy as np
 from collections import Counter
-
+import requests
 # Ensure NLTK dependencies are downloaded
 nltk.download('punkt')
 nltk.download('stopwords')
@@ -52,7 +52,6 @@ languages = {
 
 def chatGPT(prompt, model="gpt-4o", temperature=1.0) :
     st.write("Generating image description...")
-    st.text(GPT_API_KEY)
     headers = {
         'Authorization': f'Bearer {GPT_API_KEY}',
         'Content-Type': 'application/json'
