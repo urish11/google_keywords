@@ -266,6 +266,9 @@ weight_competition = st.slider("Weight for Competition Index", 0.0, 1.0, 0.3)
 weight_bids = st.slider("Weight for Average Bid", 0.0, 1.0, 0.2)
 
 enable_aggregation = st.checkbox("Enable Dynamic Keyword Aggregation", value=True)
+enable_gpt_kws = st.checkbox("Add KWs via chatGPT?", value=True)
+
+
 
 if st.button("Fetch Keyword Ideas"):
     with st.spinner("Fetching data..."):
