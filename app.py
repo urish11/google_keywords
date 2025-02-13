@@ -19,13 +19,14 @@ nltk.download('stopwords')
 nltk.download('punkt_tab')
 
 # Google Ads API credentials (use st.secrets for sensitive data)
+GPT_API_KEY = st.secrets["GPT_API_KEY"]
+
 CLIENT_ID = st.secrets["google_ads"]["CLIENT_ID"]
 CLIENT_SECRET = st.secrets["google_ads"]["CLIENT_SECRET"]
 DEVELOPER_TOKEN = st.secrets["google_ads"]["DEVELOPER_TOKEN"]
 REFRESH_TOKEN = st.secrets["google_ads"]["REFRESH_TOKEN"]
 LOGIN_CUSTOMER_ID = st.secrets["google_ads"]["LOGIN_CUSTOMER_ID"]
 CUSTOMER_ID = st.secrets["google_ads"]["CUSTOMER_ID"]
-GPT_API_KEY = st.secrets["GPT_API_KEY"]
 
 
 # Full list of locations (Country Name -> Location ID)
