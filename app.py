@@ -253,9 +253,7 @@ enable_aggregation = st.checkbox("Enable Dynamic Keyword Aggregation", value=Tru
 
 if st.button("Fetch Keyword Ideas"):
     with st.spinner("Fetching data..."):
-        st.text(keywords_input)
         keywords_input = '\n'.join(set(keywords_input.split('\n')))
-        st.text(keywords_input)
 
         keywords = [kw.strip() for kw in keywords_input.splitlines() if kw.strip()]
         if not keywords:
@@ -269,6 +267,7 @@ if st.button("Fetch Keyword Ideas"):
             if not all_data.empty:
                 all_data = calculate_quantitative_index(all_data, weight_volume, weight_competition, weight_bids)
                 st.session_state["all_data"] = all_data
+        all_data = all_data.drop_duplicates()
 
 if "all_data" in st.session_state:
     all_data = st.session_state["all_data"]
@@ -294,6 +293,7 @@ if "all_data" in st.session_state:
 
         # Aggregate Data by Clusters
         aggregated_table = aggregate_by_cluster(all_data, cluster_data)
+        aggregated_table  = aggregated_table.drop_duplicates()
 
         # Display Aggregated Table
         st.write("### Aggregated Table (By Key Phrase)")
