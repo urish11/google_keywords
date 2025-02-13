@@ -253,6 +253,10 @@ enable_aggregation = st.checkbox("Enable Dynamic Keyword Aggregation", value=Tru
 
 if st.button("Fetch Keyword Ideas"):
     with st.spinner("Fetching data..."):
+        st.markdown(keywords_input)
+        keywords_input = '\n'.join(set(keywords_input.split('\n')))
+        st.markdown(keywords_input)
+
         keywords = [kw.strip() for kw in keywords_input.splitlines() if kw.strip()]
         if not keywords:
             st.error("Please enter at least one keyword.")
