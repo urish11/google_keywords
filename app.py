@@ -279,8 +279,8 @@ if st.button("Fetch Keyword Ideas"):
         st.text(keywords_input)
 
         if enable_gpt_kws:
-            gpt_kws = chatGPT(f"write more diverse keywords for search arb with high intent and high CPC, return just the new keywords each spereted with \n for: {keywords_input}")
-            keywords_input = keywords_input + gpt_kws
+            gpt_kws = chatGPT(f"write more diverse keywords for search arb with high intent and high CPC, return JUST THE PLAIN TXT the new keywords each spereted with \n for: {keywords_input}")
+            keywords_input = keywords_input +'\n'+ gpt_kws
 
             
         st.text(keywords_input)
