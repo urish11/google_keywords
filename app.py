@@ -277,14 +277,13 @@ if enable_gpt_kws:
 if st.button("Fetch Keyword Ideas"):
     with st.spinner("Fetching data..."):
         keywords_input = '\n'.join(set(keywords_input.split('\n')))
-        st.text(keywords_input)
 
         if enable_gpt_kws:
             gpt_kws = chatGPT(f"write more {str(count_gpt_kws)} diverse and divergent  keywords (not nesseacrly containg original) for search arb with high intent and high CPC, return JUST THE PLAIN TXT the new keywords each spereted with \n for: {keywords_input}")
             keywords_input = keywords_input +'\n'+ gpt_kws
 
             
-        st.text(keywords_input)
+             st.text(keywords_input)
 
         keywords = [kw.strip() for kw in keywords_input.splitlines() if kw.strip()]
         if not keywords:
