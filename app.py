@@ -275,7 +275,7 @@ if st.button("Fetch Keyword Ideas"):
         keywords_input = '\n'.join(set(keywords_input.split('\n')))
         st.text(keywords_input)
 
-        if st.checkbox("Add KWs via chatGPT?"):
+        if enable_gpt_kws:
             gpt_kws = chatGPT(f"write more diverse keywords for search arb with high intent and high CPC, return just the new keywords each spereted with \n for: {keywords_input}")
             keywords_input = keywords_input + gpt_kws
 
