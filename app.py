@@ -258,6 +258,7 @@ enable_aggregation = st.checkbox("Enable Dynamic Keyword Aggregation", value=Tru
 
 if st.button("Fetch Keyword Ideas"):
     all_data=None
+    st.session_state["all_data"] = None
     with st.spinner("Fetching data..."):
         keywords = [kw.strip() for kw in keywords_input.splitlines() if kw.strip()]
         if not keywords:
