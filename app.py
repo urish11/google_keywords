@@ -343,6 +343,8 @@ if st.button("Fetch Keyword Ideas"):
                     time.sleep(1)
 
                     all_data = pd.concat([all_data, data], ignore_index=True)
+
+                st.text(f"Total len {len(all_data)}")
             st.text("done")
             # st.text(all_data)
             all_data = get_network_delta(all_data)
