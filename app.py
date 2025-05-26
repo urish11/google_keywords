@@ -108,13 +108,13 @@ def fetch_keyword_data(keyword, location_id, language_id):
                else:
                    latest_monthly_searches = 0  # or None, depending on what you prefer
 
-                keywords_data.append({ 
-                    "Keyword": idea.text,
-                    "Search Volume": latest_monthly_searches,
-                    "Competition Index": round(metrics.competition_index, 2),
-                    "Low Bid ($)": round(metrics.low_top_of_page_bid_micros / 1_000_000, 2),
-                    "High Bid ($)": round(metrics.high_top_of_page_bid_micros / 1_000_000, 2),
-                })
+            keywords_data.append({ 
+                "Keyword": idea.text,
+                "Search Volume": latest_monthly_searches,
+                "Competition Index": round(metrics.competition_index, 2),
+                "Low Bid ($)": round(metrics.low_top_of_page_bid_micros / 1_000_000, 2),
+                "High Bid ($)": round(metrics.high_top_of_page_bid_micros / 1_000_000, 2),
+            })
 
         return pd.DataFrame(keywords_data)
 
