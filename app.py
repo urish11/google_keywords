@@ -129,6 +129,7 @@ def fetch_keyword_data(keyword, location_id, language_id):
         keywords_data = []
         for idea in response.results:
             metrics = idea.keyword_idea_metrics
+            st.text(metrics)
             
             # ---- 3. Extract Last Month's Specific Search Volume ----
             last_month_searches = 0
