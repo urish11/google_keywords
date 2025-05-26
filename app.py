@@ -324,7 +324,7 @@ if st.button("Fetch Keyword Ideas"):
             keywords = keywords + gpt_kws.split("\n")
 
             
-        st.text(keywords)
+        
 
         if not keywords:
             st.error("Please enter at least one keyword.")
@@ -336,9 +336,9 @@ if st.button("Fetch Keyword Ideas"):
 
             for chunk in chunks:
 
-                
+                st.text(chunk)
                 for network in ["GOOGLE_SEARCH_AND_PARTNERS", "GOOGLE_SEARCH"]:
-                    data = fetch_keyword_data(keywords, selected_location, selected_language,network)
+                    data = fetch_keyword_data(chunk, selected_location, selected_language,network)
                     time.sleep(1)
 
                     all_data = pd.concat([all_data, data], ignore_index=True)
