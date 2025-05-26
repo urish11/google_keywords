@@ -340,7 +340,7 @@ if st.button("Fetch Keyword Ideas"):
 
             for chunk in chunks:
 
-                st.text(chunk)
+                st.text(keywords)
                 for network in ["GOOGLE_SEARCH_AND_PARTNERS", "GOOGLE_SEARCH"]:
                     data = fetch_keyword_data(chunk, selected_location, selected_language,network)
                     time.sleep(1)
