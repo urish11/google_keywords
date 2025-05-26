@@ -115,15 +115,25 @@ def fetch_keyword_data(keyword, location_id, language_id , network):
         time.sleep(1)
 
 
-def get_network_delta(input_df):
+def add_search_volume_diff_only_on_partners(df):
+    # Step 1: Normalize the keywords
+    df['Keyword'] = df['Keyword'].str.strip().str.lower()
 
-    pivot = input_df.pivot_table(index='Keyword', columns='Network', values='Search Volume', aggfunc='first')
-    pivot['Search Volume Diff'] = pivot.get('GOOGLE_SEARCH_AND_PARTNERS', 0) - pivot.get('GOOGLE_SEARCH', 0)
-    input_df['Search Volume Diff'] = None  # Default to None
-    mask = input_df['Network'] == 'GOOGLE_SEARCH_AND_PARTNERS'
-    input_df.loc[mask, 'Search Volume Diff'] = input_df.loc[mask, 'Keyword'].map(pivot['Search Volume Diff'])
+    # Step 2: Create pivot with search volumes per network
+    pivot = df.pivot_table(index='Keyword', columns='Network', values='Search Volume', aggfunc='first')
 
-    return input_df
+    # Step 3: Compute the difference for keywords that exist in both networks
+    pivot['Search Volume Diff'] = pivot.get('GOOGLE_SEARCH_AND_PARTNERS') - pivot.get('GOOGLE_SEARCH')
+
+    # Step 4: Merge the calculated diff back only for GOOGLE_SEARCH_AND_PARTNERS rows
+    df['Search Volume Diff'] = None  # start with None
+    for idx, row in df.iterrows():
+        if row['Network'] == 'GOOGLE_SEARCH_AND_PARTNERS':
+            kw = row['Keyword']
+            if kw in pivot.index:
+                df.at[idx, 'Search Volume Diff'] = pivot.at[kw, 'Search Volume Diff']
+
+    return df
 
 
 
