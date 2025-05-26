@@ -1,4 +1,6 @@
 import streamlit as st
+st.set_page_config(layout="wide")
+
 import google.ads.googleads
 st.text(dir(google.ads.googleads.v19))
 from google.ads.googleads.client import GoogleAdsClient
@@ -243,7 +245,6 @@ def aggregate_by_cluster(data, cluster_data):
 
 
 # Streamlit App
-st.set_page_config(layout="wide")
 
 st.title("Google Ads Keyword Ideas with Quantitative Index")
 
