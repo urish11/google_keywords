@@ -103,9 +103,14 @@ def fetch_keyword_data(keyword, location_id, language_id):
         for idea in response.results:
             metrics = idea.keyword_idea_metrics
             if metrics.avg_monthly_searches > 0 and (metrics.low_top_of_page_bid_micros > 0 ):  # Exclude rows with Search Volume == 0
+               if metrics.monthly_search_volumes:  # make sure it's not empty
+                   latest_monthly_searches = metrics.monthly_search_volumes[-1].monthly_searches
+               else:
+                   latest_monthly_searches = 0  # or None, depending on what you prefer
+
                 keywords_data.append({ 
                     "Keyword": idea.text,
-                    "Search Volume": metrics.monthly_search_volumes[-1].monthly_searches,
+                    "Search Volume": latest_monthly_searches,
                     "Competition Index": round(metrics.competition_index, 2),
                     "Low Bid ($)": round(metrics.low_top_of_page_bid_micros / 1_000_000, 2),
                     "High Bid ($)": round(metrics.high_top_of_page_bid_micros / 1_000_000, 2),
