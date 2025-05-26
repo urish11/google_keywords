@@ -2,7 +2,7 @@ import streamlit as st
 st.set_page_config(layout="wide")
 
 import google.ads.googleads
-
+import requests
 from google.ads.googleads.client import GoogleAdsClient
 from google.ads.googleads.errors import GoogleAdsException
 import pandas as pd
@@ -51,6 +51,20 @@ languages = {
     1110: "Punjabi", 1130: "Tamil", 1131: "Telugu"
 }
 
+def chatGPT(prompt, model="gpt-4o", temperature=1.0) :
+    st.write("Generating image description...")
+    headers = {
+        'Authorization': f'Bearer {GPT_API_KEY}',
+        'Content-Type': 'application/json'
+    }
+    data = {
+        'model': model,
+        'temperature': temperature,
+        'messages': [{'role': 'user', 'content': prompt}]
+    }
+    response = requests.post('https://api.openai.com/v1/chat/completions', headers=headers, json=data)
+    content = response.json()['choices'][0]['message']['content'].strip()
+    return  content
 
 def fetch_keyword_data(keyword, location_id, language_id , network):
     try:
@@ -288,12 +302,25 @@ weight_competition = st.slider("Weight for Competition Index", 0.0, 1.0, 0.3)
 weight_bids = st.slider("Weight for Average Bid", 0.0, 1.0, 0.2)
 
 enable_aggregation = st.checkbox("Enable Dynamic Keyword Aggregation", value=True)
+enable_gpt_kws = st.checkbox("Add KWs via chatGPT?", value=False)
+if enable_gpt_kws:
+    count_gpt_kws = st.number_input('How Many GPT KWs?',value = 20)
+
+
 
 if st.button("Fetch Keyword Ideas"):
     all_data=None
     st.session_state["all_data"] = None
     with st.spinner("Fetching data..."):
         keywords = [kw.strip() for kw in keywords_input.splitlines() if kw.strip()]
+
+        if enable_gpt_kws:
+            gpt_kws = chatGPT(f"write more {str(count_gpt_kws)} diverse and divergent  keywords (not nesseacrly containg original) for search arb with high intent and high CPC, return JUST THE PLAIN TXT the new keywords each spereted with \n for: {keywords_input}")
+            keywords = keywords_input +'\n'+ gpt_kws
+
+            
+        st.text(keywords_input)
+
         if not keywords:
             st.error("Please enter at least one keyword.")
         else:
