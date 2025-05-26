@@ -1,14 +1,14 @@
 
-import google.ads.googleads
-import os
+# import google.ads.googleads
+# import os
 
-# Get the directory where the 'googleads' root package is located
-package_dir = os.path.dirname(google.ads.googleads.__file__)
-print(f"Looking for API versions in: {package_dir}")
+# # Get the directory where the 'googleads' root package is located
+# package_dir = os.path.dirname(google.ads.googleads.__file__)
+# print(f"Looking for API versions in: {package_dir}")
 
-# List subdirectories that look like API versions (e.g., 'v16', 'v17')
-available_versions = [d for d in os.listdir(package_dir) if os.path.isdir(os.path.join(package_dir, d)) and d.startswith('v') and d[1:].isdigit()]
-print(f"Available API versions found: {available_versions}")
+# # List subdirectories that look like API versions (e.g., 'v16', 'v17')
+# available_versions = [d for d in os.listdir(package_dir) if os.path.isdir(os.path.join(package_dir, d)) and d.startswith('v') and d[1:].isdigit()]
+# print(f"Available API versions found: {available_versions}")
 
 
 import streamlit as st
@@ -27,7 +27,7 @@ import nltk
 import numpy as np
 from collections import Counter
 import requests
-from google.ads.googleads.v26.types import KeywordPlanHistoricalMetricsOptions, YearMonthRange # Adjust v16 if needed
+from google.ads.googleads.v19.types import KeywordPlanHistoricalMetricsOptions, YearMonthRange # Adjust v16 if needed
 from google.ads.googleads.enums.types import MonthOfYearEnum
 # Ensure NLTK dependencies are downloaded
 nltk.download('punkt')
