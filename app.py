@@ -14,7 +14,7 @@ import nltk
 import numpy as np
 from collections import Counter
 import requests
-from google.ads.googleads.v16.types import KeywordPlanHistoricalMetricsOptions, YearMonthRange # Adjust v16 if needed
+from google.ads.googleads.v18.types import KeywordPlanHistoricalMetricsOptions, YearMonthRange # Adjust v16 if needed
 from google.ads.googleads.enums.types import MonthOfYearEnum
 # Ensure NLTK dependencies are downloaded
 nltk.download('punkt')
