@@ -4,6 +4,7 @@ from google.ads.googleads.errors import GoogleAdsException
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 import time
+import datetime
 from st_aggrid import AgGrid, GridOptionsBuilder
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
@@ -65,64 +66,79 @@ def chatGPT(prompt, model="gpt-4o", temperature=1.0) :
     content = response.json()['choices'][0]['message']['content'].strip()
     return  content
 
+def get_last_month_year_month_int():
+    today = datetime.today()
+    first_day_of_current_month = today.replace(day=1)
+    last_day_of_last_month = first_day_of_current_month - timedelta(days=1)
+    return last_day_of_last_month.year, last_day_of_last_month.month
 
 
 def fetch_keyword_data(keyword, location_id, language_id):
     try:
-        client = GoogleAdsClient.load_from_dict({
-            "developer_token": DEVELOPER_TOKEN,
-            "client_id": CLIENT_ID,
-            "client_secret": CLIENT_SECRET,
-            "refresh_token": REFRESH_TOKEN,
-            "login_customer_id": LOGIN_CUSTOMER_ID,
-            "use_proto_plus": True
+        client = GoogleAdsClient.load_from_dict({ # ... your client config ...
         })
-
         keyword_plan_idea_service = client.get_service("KeywordPlanIdeaService")
-
         request = client.get_type("GenerateKeywordIdeasRequest")
         request.customer_id = CUSTOMER_ID
-
-        geo_target = client.get_type("LocationInfo")
-        geo_target.geo_target_constant = f"geoTargetConstants/{location_id}"
-        request.geo_target_constants.append(geo_target.geo_target_constant)
-
-        language = client.get_type("LanguageInfo")
-        language.language_constant = f"languageConstants/{language_id}"
-        request.language = language.language_constant
-
+        request.geo_target_constants.append(f"geoTargetConstants/{location_id}")
+        request.language = f"languageConstants/{language_id}"
+        
         keyword_seed = client.get_type("KeywordSeed")
         keyword_seed.keywords.extend([keyword])
         request.keyword_seed = keyword_seed
 
+        # ---- 1. & 2. Specify Last Month for Historical Metrics ----
+        historical_metrics_options = client.get_type("KeywordPlanHistoricalMetricsOptions")
+        year, month_int = get_last_month_year_month_int()
+        
+        # Convert integer month (1-12) to Google Ads API MonthOfYearEnum
+        # (e.g., JANUARY is 2, FEBRUARY is 3, ..., DECEMBER is 13 in many versions)
+        # Ensure this mapping is correct for your library version.
+        month_enum_value = month_int + 1 # Example: if month_int is 1 (Jan), enum becomes 2.
+        # Basic validation for the enum value (Jan=2 to Dec=13)
+        if not (MonthOfYearEnum.MonthOfYear.JANUARY <= month_enum_value <= MonthOfYearEnum.MonthOfYear.DECEMBER):
+            raise ValueError(f"Calculated month enum value {month_enum_value} for month {month_int} is out of valid range.")
+        
+        target_month_enum = MonthOfYearEnum.MonthOfYear(month_enum_value)
+
+        historical_metrics_options.year_month_range.start.year = year
+        historical_metrics_options.year_month_range.start.month = target_month_enum
+        historical_metrics_options.year_month_range.end.year = year
+        historical_metrics_options.year_month_range.end.month = target_month_enum
+        request.historical_metrics_options = historical_metrics_options
+        # ---- End Historical Metrics ----
+
         response = keyword_plan_idea_service.generate_keyword_ideas(request=request)
-        st.text(response)
-     
+        # st.text(response) # For debugging
 
         keywords_data = []
         for idea in response.results:
-            st.text(metrics.keys())
             metrics = idea.keyword_idea_metrics
-            if metrics.avg_monthly_searches > 0 and (metrics.low_top_of_page_bid_micros > 0 ):  # Exclude rows with Search Volume == 0
-               if metrics.monthly_search_volumes:  # make sure it's not empty
-                   latest_monthly_searches = metrics.monthly_search_volumes[-1].monthly_searches
-               else:
-                   latest_monthly_searches = 0  # or None, depending on what you prefer
-            keywords_data.append({ 
-                "Keyword": idea.text,
-                "Search Volume": latest_monthly_searches,
-                "Competition Index": round(metrics.competition_index, 2),
-                "Low Bid ($)": round(metrics.low_top_of_page_bid_micros / 1_000_000, 2),
-                "High Bid ($)": round(metrics.high_top_of_page_bid_micros / 1_000_000, 2),
-            })
-
+            
+            # ---- 3. Extract Last Month's Specific Search Volume ----
+            last_month_searches = 0
+            if metrics.monthly_search_volumes:
+                for msv in metrics.monthly_search_volumes:
+                    # msv.month is an enum, msv.year is an int
+                    if msv.year == year and msv.month == target_month_enum:
+                        last_month_searches = msv.monthly_searches
+                        break
+            
+            if last_month_searches > 0 and (metrics.low_top_of_page_bid_micros > 0):
+                keywords_data.append({
+                    "Keyword": idea.text,
+                    "Search Volume (Last Month)": last_month_searches,
+                    # "Avg Monthly Searches": metrics.avg_monthly_searches, # Original average
+                    "Competition Index": round(metrics.competition_index, 2) if metrics.competition_index else None,
+                    "Low Bid ($)": round(metrics.low_top_of_page_bid_micros / 1_000_000, 2),
+                    "High Bid ($)": round(metrics.high_top_of_page_bid_micros / 1_000_000, 2),
+                })
         return pd.DataFrame(keywords_data)
-
-    except GoogleAdsException as ex:
-        st.error(f"Error fetching data for keyword '{keyword}': Check your API credentials and parameters.")
+    except Exception as e:
+        print(f"Error: {e}") # st.error(f"Error: {e}")
         return pd.DataFrame()
-    except:
-        time.sleep(1)
+
+
 
 def calculate_quantitative_index(df, weight_volume, weight_competition, weight_bids):
     df["Average Bid"] = (df["Low Bid ($)"] + df["High Bid ($)"]) / 2
