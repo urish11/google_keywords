@@ -108,7 +108,7 @@ def fetch_keyword_data(keyword, location_id, language_id):
                    st.text("Ffff" + metrics.monthly_search_volumes[-1].monthly_searches)
                else:
                    latest_monthly_searches = 0  # or None, depending on what you prefer
-
+            latest_monthly_searches = -5
             keywords_data.append({ 
                 "Keyword": idea.text,
                 "Search Volume": latest_monthly_searches,
