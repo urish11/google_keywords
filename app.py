@@ -339,8 +339,8 @@ if st.button("Fetch Keyword Ideas"):
             chunks = np.array_split(np.array(keywords),n_of_chunks  )
 
             for chunk in chunks:
-
-                st.text(keywords)
+                chunk = list(chunk)
+                st.text(chunk)
                 for network in ["GOOGLE_SEARCH_AND_PARTNERS", "GOOGLE_SEARCH"]:
                     data = fetch_keyword_data(chunk, selected_location, selected_language,network)
                     time.sleep(1)
