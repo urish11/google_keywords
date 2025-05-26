@@ -334,7 +334,7 @@ if st.button("Fetch Keyword Ideas"):
             for keyword in keywords:
                 for network in ["GOOGLE_SEARCH_AND_PARTNERS", "GOOGLE_SEARCH"]:
                     data = fetch_keyword_data(keyword, selected_location, selected_language,network)
-                    time.sleep(1)
+                    time.sleep(0.5)
 
                     all_data = pd.concat([all_data, data], ignore_index=True)
             st.text("done")
