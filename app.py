@@ -332,7 +332,7 @@ if st.button("Fetch Keyword Ideas"):
             all_data = pd.DataFrame()
             st.text("going to google")
             n_of_chunks =len(keywords)// 20 + 1
-            if len(keywords) > 19 : n_of_chunks=1
+            if len(keywords) > 20 : n_of_chunks=1
             # n_of_chunks= len(keywords)
 
             st.text(type(keywords))
