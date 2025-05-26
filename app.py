@@ -257,6 +257,7 @@ weight_bids = st.slider("Weight for Average Bid", 0.0, 1.0, 0.2)
 enable_aggregation = st.checkbox("Enable Dynamic Keyword Aggregation", value=True)
 
 if st.button("Fetch Keyword Ideas"):
+    all_data=None
     with st.spinner("Fetching data..."):
         keywords = [kw.strip() for kw in keywords_input.splitlines() if kw.strip()]
         if not keywords:
