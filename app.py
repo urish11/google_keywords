@@ -4,7 +4,7 @@ from google.ads.googleads.errors import GoogleAdsException
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 import time
-import datetime
+from datetime import datetime, timedelta
 from st_aggrid import AgGrid, GridOptionsBuilder
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
@@ -14,6 +14,8 @@ import nltk
 import numpy as np
 from collections import Counter
 import requests
+from google.ads.googleads.v16.types import KeywordPlanHistoricalMetricsOptions, YearMonthRange # Adjust v16 if needed
+from google.ads.googleads.enums.types import MonthOfYearEnum
 # Ensure NLTK dependencies are downloaded
 nltk.download('punkt')
 nltk.download('stopwords')
