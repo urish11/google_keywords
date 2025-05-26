@@ -135,7 +135,7 @@ def fetch_keyword_data(keyword, location_id, language_id):
                     "Low Bid ($)": round(metrics.low_top_of_page_bid_micros / 1_000_000, 2),
                     "High Bid ($)": round(metrics.high_top_of_page_bid_micros / 1_000_000, 2),
                 })
-        st.text(keywords_data)
+        # st.text(keywords_data)
         return pd.DataFrame(keywords_data)
     except Exception as e:
         print(f"Error: {e}") # st.error(f"Error: {e}")
