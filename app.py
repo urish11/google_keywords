@@ -124,6 +124,7 @@ def fetch_keyword_data(keyword, location_id, language_id):
                     # msv.month is an enum, msv.year is an int
                     if msv.year == year and msv.month == target_month_enum:
                         last_month_searches = msv.monthly_searches
+                        st.write("last" + last_month_searches)
                         break
             
             if last_month_searches > 0 and (metrics.low_top_of_page_bid_micros > 0):
