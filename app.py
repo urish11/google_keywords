@@ -91,7 +91,7 @@ def fetch_keyword_data(keyword, location_id, language_id , network):
         request.keyword_seed = keyword_seed
 
         response = keyword_plan_idea_service.generate_keyword_ideas(request=request)
-        st.text(str(response))
+        # st.text(str(response))
         keywords_data = []
         ils_usd = 3.6
         for idea in response.results:
