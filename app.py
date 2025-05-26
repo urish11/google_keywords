@@ -2,7 +2,7 @@ import streamlit as st
 st.set_page_config(layout="wide")
 
 import google.ads.googleads
-from google.ads.googleads.v19.enums.types.keyword_plan_network import KeywordPlanNetwork
+from google.ads.googleads.enums.types.keyword_plan_network import KeywordPlanNetwork
 
 from google.ads.googleads.client import GoogleAdsClient
 from google.ads.googleads.errors import GoogleAdsException
