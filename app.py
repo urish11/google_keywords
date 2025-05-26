@@ -114,6 +114,17 @@ def fetch_keyword_data(keyword, location_id, language_id , network):
     except:
         time.sleep(1)
 
+
+def get_network_delta(input_df):
+
+    pivot = input_df.pivot_table(index='Keyword', columns='Network', values='Search Volume', aggfunc='first')
+    pivot['Search Volume Diff'] = pivot.get('GOOGLE_SEARCH_AND_PARTNERS', 0) - pivot.get('GOOGLE_SEARCH', 0)
+    input_df['Search Volume Diff'] = df['Keyword'].map(pivot['Search Volume Diff'])
+
+    return input_df
+
+
+
 def calculate_quantitative_index(df, weight_volume, weight_competition, weight_bids):
     df["Average Bid"] = (df["Low Bid ($)"] + df["High Bid ($)"]) / 2
 
@@ -281,7 +292,9 @@ if st.button("Fetch Keyword Ideas"):
                     data = fetch_keyword_data(keyword, selected_location, selected_language,network)
                     all_data = pd.concat([all_data, data], ignore_index=True)
             st.text("done")
-            st.text(all_data)
+            # st.text(all_data)
+            all_data = get_network_delta(all_data)
+
             if not all_data.empty:
                 all_data = calculate_quantitative_index(all_data, weight_volume, weight_competition, weight_bids)
                 st.session_state["all_data"] = all_data
