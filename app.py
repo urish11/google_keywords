@@ -2,7 +2,6 @@ import streamlit as st
 st.set_page_config(layout="wide")
 
 import google.ads.googleads
-from google.ads.googleads.v18.enums.types.keyword_plan_network import KeywordPlanNetwork
 
 from google.ads.googleads.client import GoogleAdsClient
 from google.ads.googleads.errors import GoogleAdsException
@@ -80,7 +79,7 @@ def fetch_keyword_data(keyword, location_id, language_id):
 
         # network = client.get_type("KeywordPlanNetwork")
         # network.network_constant = f"KeywordPlanNetwork/GOOGLE_SEARCH"
-        request.keyword_plan_network = KeywordPlanNetwork.GOOGLE_SEARCH 
+        request.keyword_plan_network = client.enums.KeywordPlanNetworkEnum.GOOGLE_SEARCH_AND_PARTNERS 
         
         keyword_seed = client.get_type("KeywordSeed")
         keyword_seed.keywords.extend([keyword])
