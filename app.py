@@ -72,6 +72,11 @@ def fetch_keyword_data(keyword, location_id, language_id):
         language.language_constant = f"languageConstants/{language_id}"
         request.language = language.language_constant
 
+
+        network = client.get_type("KeywordPlanNetwork")
+        network.network_constant = f"KeywordPlanNetwork/GOOGLE_SEARCH_AND_PARTNERS"
+        request.keyword_plan_network = network.network_constant
+        
         keyword_seed = client.get_type("KeywordSeed")
         keyword_seed.keywords.extend([keyword])
         request.keyword_seed = keyword_seed
