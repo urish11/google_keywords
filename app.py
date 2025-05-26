@@ -1,6 +1,6 @@
 import streamlit as st
 import google.ads.googleads
-st.text(dir(google.ads.googleads))
+st.text(dir(google.ads.googleads.v19))
 from google.ads.googleads.client import GoogleAdsClient
 from google.ads.googleads.errors import GoogleAdsException
 import pandas as pd
