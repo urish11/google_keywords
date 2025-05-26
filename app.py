@@ -1,5 +1,5 @@
 import streamlit as st
-from google.ads.googleads.v17.client import GoogleAdsClient
+from google.ads.googleads.v18.client import GoogleAdsClient
 from google.ads.googleads.errors import GoogleAdsException
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
