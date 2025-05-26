@@ -270,6 +270,7 @@ if st.button("Fetch Keyword Ideas"):
                 data = fetch_keyword_data(keyword, selected_location, selected_language)
                 all_data = pd.concat([all_data, data], ignore_index=True)
             st.text("done")
+            st.text(all_data)
             if not all_data.empty:
                 all_data = calculate_quantitative_index(all_data, weight_volume, weight_competition, weight_bids)
                 st.session_state["all_data"] = all_data
