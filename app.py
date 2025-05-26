@@ -115,7 +115,7 @@ def fetch_keyword_data(keyword, location_id, language_id , network):
         time.sleep(1)
 
 
-def add_search_volume_diff_only_on_partners(df):
+def get_network_delta(df):
     # Step 1: Normalize the keywords
     df['Keyword'] = df['Keyword'].str.strip().str.lower()
 
