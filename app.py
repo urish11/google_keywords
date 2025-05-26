@@ -331,8 +331,8 @@ if st.button("Fetch Keyword Ideas"):
         else:
             all_data = pd.DataFrame()
             st.text("going to google")
-
-            chunks = np.split(keywords, (len(keywords)// 20) + 1 )
+            n_of_chunks =len(keywords)// 20 + 1
+            chunks = np.split(keywords,n_of_chunks  )
 
             for chunk in chunks:
 
