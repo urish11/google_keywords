@@ -333,7 +333,7 @@ if st.button("Fetch Keyword Ideas"):
             st.text("going to google")
             n_of_chunks =len(keywords)// 20 + 1
             st.text(type(keywords))
-            chunks = np.split(keywords,n_of_chunks  )
+            chunks = np.split(np.array(keywords),n_of_chunks  )
 
             for chunk in chunks:
 
