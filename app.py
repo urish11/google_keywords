@@ -52,8 +52,10 @@ languages = {
 }
 
 
-def fetch_keyword_data(keyword, location_id, language_id):
+def fetch_keyword_data(keyword, location_id, language_id , network):
     try:
+
+        
         client = GoogleAdsClient.load_from_dict({
             "developer_token": DEVELOPER_TOKEN,
             "client_id": CLIENT_ID,
@@ -79,7 +81,10 @@ def fetch_keyword_data(keyword, location_id, language_id):
 
         # network = client.get_type("KeywordPlanNetwork")
         # network.network_constant = f"KeywordPlanNetwork/GOOGLE_SEARCH"
-        request.keyword_plan_network = client.enums.KeywordPlanNetworkEnum.GOOGLE_SEARCH_AND_PARTNERS 
+        if network == "GOOGLE_SEARCH_AND_PARTNERS":
+            request.keyword_plan_network = client.enums.KeywordPlanNetworkEnum.GOOGLE_SEARCH_AND_PARTNERS 
+        elif network == "GOOGLE_SEARCH":
+            request.keyword_plan_network = client.enums.KeywordPlanNetworkEnum.GOOGLE_SEARCH
         
         keyword_seed = client.get_type("KeywordSeed")
         keyword_seed.keywords.extend([keyword])
@@ -98,6 +103,7 @@ def fetch_keyword_data(keyword, location_id, language_id):
                     "Competition Index": round(metrics.competition_index, 2),
                     "Low Bid ($)": round(metrics.low_top_of_page_bid_micros / 1_000_000 / ils_usd, 2),
                     "High Bid ($)": round(metrics.high_top_of_page_bid_micros / 1_000_000 / ils_usd, 2),
+                    "Network" : network
                 })
 
         return pd.DataFrame(keywords_data)
@@ -271,8 +277,9 @@ if st.button("Fetch Keyword Ideas"):
             all_data = pd.DataFrame()
             st.text("going to google")
             for keyword in keywords:
-                data = fetch_keyword_data(keyword, selected_location, selected_language)
-                all_data = pd.concat([all_data, data], ignore_index=True)
+                for network in ["GOOGLE_SEARCH_AND_PARTNERS", "GOOGLE_SEARCH"]:
+                    data = fetch_keyword_data(keyword, selected_location, selected_language)
+                    all_data = pd.concat([all_data, data], ignore_index=True)
             st.text("done")
             st.text(all_data)
             if not all_data.empty:
