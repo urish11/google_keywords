@@ -101,13 +101,13 @@ def fetch_keyword_data(keyword, location_id, language_id):
 
         keywords_data = []
         for idea in response.results:
+            st.text(metrics.keys())
             metrics = idea.keyword_idea_metrics
             if metrics.avg_monthly_searches > 0 and (metrics.low_top_of_page_bid_micros > 0 ):  # Exclude rows with Search Volume == 0
                if metrics.monthly_search_volumes:  # make sure it's not empty
                    latest_monthly_searches = metrics.monthly_search_volumes[-1].monthly_searches
                else:
                    latest_monthly_searches = 0  # or None, depending on what you prefer
-            latest_monthly_searches = -5
             keywords_data.append({ 
                 "Keyword": idea.text,
                 "Search Volume": latest_monthly_searches,
