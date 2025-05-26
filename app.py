@@ -119,7 +119,7 @@ def get_network_delta(input_df):
 
     pivot = input_df.pivot_table(index='Keyword', columns='Network', values='Search Volume', aggfunc='first')
     pivot['Search Volume Diff'] = pivot.get('GOOGLE_SEARCH_AND_PARTNERS', 0) - pivot.get('GOOGLE_SEARCH', 0)
-    input_df['Search Volume Diff'] = df['Keyword'].map(pivot['Search Volume Diff'])
+    input_df['Search Volume Diff'] = input_df['Keyword'].map(pivot['Search Volume Diff'])
 
     return input_df
 
