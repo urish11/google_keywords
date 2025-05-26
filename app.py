@@ -324,7 +324,7 @@ if st.button("Fetch Keyword Ideas"):
             keywords = keywords_input +'\n'+ gpt_kws
 
             
-        st.text(keywords_input)
+        st.text(keywords)
 
         if not keywords:
             st.error("Please enter at least one keyword.")
