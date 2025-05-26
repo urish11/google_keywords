@@ -27,8 +27,8 @@ import nltk
 import numpy as np
 from collections import Counter
 import requests
-from google.ads.googleads.types import KeywordPlanHistoricalMetricsOptions, YearMonthRange # Adjust v16 if needed
-from google.ads.googleads.enums.types import MonthOfYearEnum
+# from google.ads.googleads.types import KeywordPlanHistoricalMetricsOptions, YearMonthRange # Adjust v16 if needed
+# from google.ads.googleads.enums.types import MonthOfYearEnum
 # Ensure NLTK dependencies are downloaded
 nltk.download('punkt')
 nltk.download('stopwords')
@@ -102,25 +102,25 @@ def fetch_keyword_data(keyword, location_id, language_id):
         keyword_seed.keywords.extend([keyword])
         request.keyword_seed = keyword_seed
 
-        # ---- 1. & 2. Specify Last Month for Historical Metrics ----
-        historical_metrics_options = client.get_type("KeywordPlanHistoricalMetricsOptions")
-        year, month_int = get_last_month_year_month_int()
+        # # ---- 1. & 2. Specify Last Month for Historical Metrics ----
+        # historical_metrics_options = client.get_type("KeywordPlanHistoricalMetricsOptions")
+        # year, month_int = get_last_month_year_month_int()
         
-        # Convert integer month (1-12) to Google Ads API MonthOfYearEnum
-        # (e.g., JANUARY is 2, FEBRUARY is 3, ..., DECEMBER is 13 in many versions)
-        # Ensure this mapping is correct for your library version.
-        month_enum_value = month_int + 1 # Example: if month_int is 1 (Jan), enum becomes 2.
-        # Basic validation for the enum value (Jan=2 to Dec=13)
-        if not (MonthOfYearEnum.MonthOfYear.JANUARY <= month_enum_value <= MonthOfYearEnum.MonthOfYear.DECEMBER):
-            raise ValueError(f"Calculated month enum value {month_enum_value} for month {month_int} is out of valid range.")
+        # # Convert integer month (1-12) to Google Ads API MonthOfYearEnum
+        # # (e.g., JANUARY is 2, FEBRUARY is 3, ..., DECEMBER is 13 in many versions)
+        # # Ensure this mapping is correct for your library version.
+        # month_enum_value = month_int + 1 # Example: if month_int is 1 (Jan), enum becomes 2.
+        # # Basic validation for the enum value (Jan=2 to Dec=13)
+        # if not (MonthOfYearEnum.MonthOfYear.JANUARY <= month_enum_value <= MonthOfYearEnum.MonthOfYear.DECEMBER):
+        #     raise ValueError(f"Calculated month enum value {month_enum_value} for month {month_int} is out of valid range.")
         
-        target_month_enum = MonthOfYearEnum.MonthOfYear(month_enum_value)
+        # target_month_enum = MonthOfYearEnum.MonthOfYear(month_enum_value)
 
-        historical_metrics_options.year_month_range.start.year = year
-        historical_metrics_options.year_month_range.start.month = target_month_enum
-        historical_metrics_options.year_month_range.end.year = year
-        historical_metrics_options.year_month_range.end.month = target_month_enum
-        request.historical_metrics_options = historical_metrics_options
+        # historical_metrics_options.year_month_range.start.year = year
+        # historical_metrics_options.year_month_range.start.month = target_month_enum
+        # historical_metrics_options.year_month_range.end.year = year
+        # historical_metrics_options.year_month_range.end.month = target_month_enum
+        # request.historical_metrics_options = historical_metrics_options
         # ---- End Historical Metrics ----
 
         response = keyword_plan_idea_service.generate_keyword_ideas(request=request)
@@ -133,12 +133,13 @@ def fetch_keyword_data(keyword, location_id, language_id):
             # ---- 3. Extract Last Month's Specific Search Volume ----
             last_month_searches = 0
             if metrics.monthly_search_volumes:
-                for msv in metrics.monthly_search_volumes:
-                    # msv.month is an enum, msv.year is an int
-                    if msv.year == year and msv.month == target_month_enum:
-                        last_month_searches = msv.monthly_searches
-                        st.write("last" + last_month_searches)
-                        break
+                last_month_searches = metrics.monthly_search_volumes[-1].monthly_searches
+                # for msv in metrics.monthly_search_volumes:
+                #     # msv.month is an enum, msv.year is an int
+                #     if msv.year == year and msv.month == target_month_enum:
+                #         last_month_searches = msv.monthly_searches
+                #         st.write("last" + last_month_searches)
+                #         break
             
             if last_month_searches > 0 and (metrics.low_top_of_page_bid_micros > 0):
                 keywords_data.append({
