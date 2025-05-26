@@ -79,7 +79,7 @@ def fetch_keyword_data(keyword, location_id, language_id):
 
         # network = client.get_type("KeywordPlanNetwork")
         # network.network_constant = f"KeywordPlanNetwork/GOOGLE_SEARCH"
-        request.keyword_plan_network = client.enums.KeywordPlanNetworkEnum.GOOGLE_SEARCH_AND_PARTNERS 
+        request.keyword_plan_network = client.enums.KeywordPlanNetworkEnum.GOOGLE_SEARCH
         
         keyword_seed = client.get_type("KeywordSeed")
         keyword_seed.keywords.extend([keyword])
