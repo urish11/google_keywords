@@ -1,4 +1,5 @@
 import streamlit as st
+import google.ads.googleads
 st.text(dir(google.ads.googleads))
 from google.ads.googleads.client import GoogleAdsClient
 from google.ads.googleads.errors import GoogleAdsException
