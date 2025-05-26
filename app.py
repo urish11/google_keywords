@@ -97,7 +97,7 @@ def fetch_keyword_data(keyword, location_id, language_id):
 
         return pd.DataFrame(keywords_data)
 
-    except GoogleAdsException as ex:
+    except Exception as ex:
         st.error(f"Error fetching data for keyword '{keyword}': Check your API credentials and parameters.")
         return pd.DataFrame()
     except:
