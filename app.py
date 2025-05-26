@@ -265,10 +265,11 @@ if st.button("Fetch Keyword Ideas"):
             st.error("Please enter at least one keyword.")
         else:
             all_data = pd.DataFrame()
+            st.text("going to google")
             for keyword in keywords:
                 data = fetch_keyword_data(keyword, selected_location, selected_language)
                 all_data = pd.concat([all_data, data], ignore_index=True)
-
+            st.text("done")
             if not all_data.empty:
                 all_data = calculate_quantitative_index(all_data, weight_volume, weight_competition, weight_bids)
                 st.session_state["all_data"] = all_data
