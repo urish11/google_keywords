@@ -79,7 +79,7 @@ def fetch_keyword_data(keyword, location_id, language_id):
 
         # network = client.get_type("KeywordPlanNetwork")
         # network.network_constant = f"KeywordPlanNetwork/GOOGLE_SEARCH"
-        request.keyword_plan_network = client.enums.KeywordPlanNetworkEnum.GOOGLE_SEARCH
+        request.keyword_plan_network = client.enums.KeywordPlanNetworkEnum.GOOGLE_SEARCH_AND_PARTNERS 
         
         keyword_seed = client.get_type("KeywordSeed")
         keyword_seed.keywords.extend([keyword])
@@ -88,6 +88,7 @@ def fetch_keyword_data(keyword, location_id, language_id):
         response = keyword_plan_idea_service.generate_keyword_ideas(request=request)
         st.text(str(response))
         keywords_data = []
+        ils_usd = 3.6
         for idea in response.results:
             metrics = idea.keyword_idea_metrics
             if metrics.avg_monthly_searches > 0 and (metrics.low_top_of_page_bid_micros > 0 ):  # Exclude rows with Search Volume == 0
@@ -95,8 +96,8 @@ def fetch_keyword_data(keyword, location_id, language_id):
                     "Keyword": idea.text,
                     "Search Volume": metrics.monthly_search_volumes[-1].monthly_searches,
                     "Competition Index": round(metrics.competition_index, 2),
-                    "Low Bid ($)": round(metrics.low_top_of_page_bid_micros / 1_000_000, 2),
-                    "High Bid ($)": round(metrics.high_top_of_page_bid_micros / 1_000_000, 2),
+                    "Low Bid ($)": round(metrics.low_top_of_page_bid_micros / 1_000_000 / ils_usd, 2),
+                    "High Bid ($)": round(metrics.high_top_of_page_bid_micros / 1_000_000 / ils, 2),
                 })
 
         return pd.DataFrame(keywords_data)
