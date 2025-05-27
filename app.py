@@ -450,6 +450,7 @@ if "all_data" in st.session_state:
             st.dataframe(selected_df)
 
             subset = pd.DataFrame({'name': selected_df['Keyword']})
+            st.text(subset)
 
             prompt= """Please go over the following search arbitrage ideas, i want u to group these kws to remove repeating ones, like if u see rent to own vehicles no deposit AND cars rent to own no deposit group them into a concise 1 term like :'rent to own vehicles no deposit'
                                     
