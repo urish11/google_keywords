@@ -330,7 +330,7 @@ st.title("Google Ads Keyword Ideas with Quantitative Index")
 selected_location = st.selectbox("Select Location:", options=list(locations.keys()), format_func=lambda x: locations[x])
 selected_language = st.selectbox("Select Language:", options=list(languages.keys()), format_func=lambda x: languages[x])
 keywords_input = st.text_area("Enter a list of keywords (one per line):",height=450)
-
+ 
 st.write("### Set Weights for Quantitative Index")
 weight_volume = st.slider("Weight for Search Volume", 0.0, 1.0, 0.5)
 weight_competition = st.slider("Weight for Competition Index", 0.0, 1.0, 0.3)
