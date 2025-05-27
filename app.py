@@ -420,6 +420,8 @@ if "all_data" in st.session_state:
     grid_options['paginationPageSize'] = 50
     grid_options['pagination'] = True
     grid_options['paginationAutoPageSize'] = False
+    grid_options['domLayout'] = 'autoHeight'
+
     grid_options['paginationPageSizeOptions'] = [10, 20, 50, 100, 200,400,500,600,700,800,900,1000,2000]  # 👈 Here are your presets
     grid_options['suppressPaginationPanel'] = False  # Must be False to show the dropdown
 
