@@ -439,7 +439,7 @@ if "all_data" in st.session_state:
 
 
                         """ + subset.to_csv()
-        with st.expander("prompt"):
+        with st.status("Proccessing prompt: "):
             st.text(prompt) 
             group_res = gemini_text_lib(prompt).replace("```json","").replace("```","")
             
@@ -479,7 +479,7 @@ if "all_data" in st.session_state:
                 "Weighted Avg Low Bid ($)": weighted_avg("Low Bid ($)"),
                 "Weighted Avg High Bid ($)": weighted_avg("High Bid ($)"),
                 "Weighted Avg Quantitative Index": weighted_avg("Quantitative Index"),
-                "Avg Search Volume Diff": group_rows["Search Volume Diff"].mean() if "Search Volume Diff" in group_rows.columns else None,
+                "Sum Search Volume Diff": group_rows["Search Volume Diff"].sum() if "Search Volume Diff" in group_rows.columns else None,
             }
             agg_results.append(agg_row)
 
