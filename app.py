@@ -368,7 +368,7 @@ if "all_data" in st.session_state:
     gb.configure_grid_options(enableRangeSelection=True,rowSelection="multiple")  # Enable range selection
     gb.configure_grid_options(pagination=True, paginationPageSize=50, paginationAutoPageSize=False, paginationMode="client")
     gb.configure_column(
-    "",  # A dummy column name, AgGrid will create it
+    " ",  # A dummy column name, AgGrid will create it
     headerCheckboxSelection=True,  # Checkbox in the header for "select all"
     checkboxSelection=True,       # Checkbox for each row
     pinned="left",                # Pin to the left for visibility
