@@ -107,13 +107,13 @@ def fetch_keyword_data(keyword, location_id, language_id , network):
         elif network == "GOOGLE_SEARCH":
             request.keyword_plan_network = client.enums.KeywordPlanNetworkEnum.GOOGLE_SEARCH
         
-        # keyword_seed = client.get_type("KeywordSeed")
-        # keyword_seed.keywords.extend(keyword)
-        # request.keyword_seed = keyword_seed
+        keyword_seed = client.get_type("KeywordSeed")
+        keyword_seed.keywords.extend(keyword)
+        request.keyword_seed = keyword_seed
 
-        url_seed = client.get_type("UrlSeed")
-        url_seed.url = "https://searchlabz.com/motorcycle-payment-plans-with-no-credit-check-en/"
-        request.url_seed= url_seed
+        # url_seed = client.get_type("UrlSeed")
+        # url_seed.url = "https://searchlabz.com/motorcycle-payment-plans-with-no-credit-check-en/"
+        # request.url_seed= url_seed
  
         response = keyword_plan_idea_service.generate_keyword_ideas(request=request)
         # st.text(str(response))
