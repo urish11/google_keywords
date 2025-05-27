@@ -410,7 +410,7 @@ if "all_data" in st.session_state:
 #     suppressMenu=True,            # No menu for this column
 #     width=5                      # Adjust width
 # )
-    col1, _ = st.columns([1, 5])  
+    col1, _ = st.columns([1, 7])  
     with col1:
         page_size = st.selectbox("Rows per page", [10, 20, 50, 100, 200, 500, 1000], index=3,)
 
