@@ -9,7 +9,7 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 import time
 from google import genai
-
+import json
 from st_aggrid import AgGrid, GridOptionsBuilder
 # from nltk.corpus import stopwords
 # from nltk.tokenize import word_tokenize
@@ -439,10 +439,50 @@ if "all_data" in st.session_state:
                         """ + subset.to_csv()
         with st.expander("prompt"):
             st.text(prompt) 
-            group_res = gemini_text_lib(prompt)
+            group_res = gemini_text_lib(prompt).replace("```json","").replace("```","")
+            
             st.text(group_res)
 
 
+            
+        try:
+            grouped_ideas = json.loads(group_res)
+        except json.JSONDecodeError as e:
+            st.error("Failed to parse JSON from Gemini output.")
+            st.stop()
+
+        # Initialize a list to hold aggregation results
+        agg_results = []
+
+        # Loop over groups and calculate aggregate metrics
+        for group in grouped_ideas:
+            indices = group.get("indices", [])
+            idea = group.get("idea", "")
+            group_rows = selected_df.iloc[indices]
+
+            # Avoid division by zero
+            total_volume = group_rows["Search Volume"].sum()
+            if total_volume == 0:
+                total_volume = 1
+
+            def weighted_avg(col):
+                return (group_rows[col] * group_rows["Search Volume"]).sum() / total_volume
+
+            agg_row = {
+                "Grouped Idea": idea,
+                "Count": len(group_rows),
+                "Total Search Volume": group_rows["Search Volume"].sum(),
+                "Weighted Avg Competition Index": weighted_avg("Competition Index"),
+                "Weighted Avg Low Bid ($)": weighted_avg("Low Bid ($)"),
+                "Weighted Avg High Bid ($)": weighted_avg("High Bid ($)"),
+                "Weighted Avg Quantitative Index": weighted_avg("Quantitative Index"),
+                "Avg Search Volume Diff": group_rows["Search Volume Diff"].mean() if "Search Volume Diff" in group_rows.columns else None,
+            }
+            agg_results.append(agg_row)
+
+        agg_df = pd.DataFrame(agg_results)
+        st.write("### Aggregated Grouped Ideas (Weighted by Search Volume)")
+        st.dataframe(agg_df)
 
 
 
