@@ -427,8 +427,18 @@ if st.button("proccess!"):
 
         subset = pd.DataFrame({'name': selected_df['Keyword']})
 
-        prompt = """...""" + subset.to_csv()
+        prompt= """Please go over the following search arbitrage ideas, i want u to group these kws to remove repeating ones, like if u see rent to own vehicles no deposit AND cars rent to own no deposit group them into a concise 1 term like :'rent to own vehicles no deposit'
+                                
+                                group close keywords that would yield same search results on google like :["rent to own homes near me","rent to own homes","cheap rent to own houses near me"] are 1 group for example (ehrn write new groupd idea text dont use special chars !)
+                                im going to provied you with table 2 col : idea , indecies
 
+                                i want u to group the ideas and reurn json of idea and list of indecies,
+                                [{idea:'idea1...', indices:[list_of_indices]},{idea:'idea2...', indices:[list_of_indices]}...]
+
+                                no intros no extra JUST the json
+
+
+                                """ + subset.to_csv()
         with st.status("Processing prompt..."):
             st.text(prompt)
             group_res = gemini_text_lib(prompt).replace("```json","").replace("```","")
