@@ -385,7 +385,7 @@ if "all_data" in st.session_state:
     grid_options = gb.build()
     grid_response = AgGrid(all_data, gridOptions=grid_options, height=800, width=700, theme="streamlit",update_mode='SELECTION_CHANGED')
 
-    if st.button("proccess!"):
+    if st.checkbox("proccess!"):
 
         st.dataframe(pd.DataFrame(grid_response))
 
