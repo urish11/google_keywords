@@ -367,15 +367,15 @@ if "all_data" in st.session_state:
     gb.configure_column("Keyword", filter=True)
     gb.configure_grid_options(enableRangeSelection=True,rowSelection="multiple")  # Enable range selection
     gb.configure_grid_options(pagination=True, paginationPageSize=50, paginationAutoPageSize=False, paginationMode="client")
-    gb.configure_column(
-    "sel",  # A dummy column name, AgGrid will create it
-    headerCheckboxSelection=True,  # Checkbox in the header for "select all"
-    checkboxSelection=True,       # Checkbox for each row
-    pinned="left",                # Pin to the left for visibility
-    lockPosition=True,            # Prevent moving it
-    suppressMenu=True,            # No menu for this column
-    width=5                      # Adjust width
-)
+#     gb.configure_column(
+#     "sel",  # A dummy column name, AgGrid will create it
+#     headerCheckboxSelection=True,  # Checkbox in the header for "select all"
+#     checkboxSelection=True,       # Checkbox for each row
+#     pinned="left",                # Pin to the left for visibility
+#     lockPosition=True,            # Prevent moving it
+#     suppressMenu=True,            # No menu for this column
+#     width=5                      # Adjust width
+# )
  
     gb.configure_grid_options(clipboard=True)  # Enable clipboard copy
     gb.configure_selection(selection_mode='multiple', use_checkbox=True)
@@ -387,7 +387,8 @@ if "all_data" in st.session_state:
 
     if st.button("proccess!"):
 
-        selected_rows_data = grid_response['sel']
+        selected_rows_data = grid_response['selected_rows']
+
 
 
 
