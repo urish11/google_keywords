@@ -414,8 +414,8 @@ if "all_data" in st.session_state:
 
     grid_options = gb.build()
     grid_response = AgGrid(all_data, gridOptions=grid_options, height=800, width=700, theme="streamlit",update_mode='SELECTION_CHANGED')
-
-    if st.checkbox("proccess!"):
+    
+    if st.button("proccess!"):
         # st.text(str(grid_response))
         selected_df = pd.DataFrame(grid_response['selected_rows'])
         selected_df = selected_df.reset_index()
@@ -485,6 +485,7 @@ if "all_data" in st.session_state:
             agg_results.append(agg_row)
 
         agg_df = pd.DataFrame(agg_results)
+    if agg_df:
         st.write("### Aggregated Grouped Ideas (Weighted by Search Volume)")
         st.dataframe(agg_df)
 
