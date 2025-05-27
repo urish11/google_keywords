@@ -378,6 +378,8 @@ if "all_data" in st.session_state:
 )
  
     gb.configure_grid_options(clipboard=True)  # Enable clipboard copy
+    gb.configure_selection(selection_mode='multiple', use_checkbox=True)
+
     gb.configure_column("Search Volume", sort="desc")
 
     grid_options = gb.build()
