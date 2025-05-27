@@ -417,7 +417,8 @@ if "all_data" in st.session_state:
 
     if st.checkbox("proccess!"):
         # st.text(str(grid_response))
-        st.dataframe(pd.DataFrame(grid_response['selected_rows']))
+        selected_df = pd.DataFrame(grid_response['selected_rows'])
+        st.dataframe(pd.selected_df)
 
         selected_rows_data = grid_response['selected_rows']
 
@@ -431,7 +432,7 @@ if "all_data" in st.session_state:
 
 
 
-                        """)
+                        """) + selected_df[['Keyword','index']]
         st.text(group_res)
 
 
