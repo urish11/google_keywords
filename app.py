@@ -419,7 +419,7 @@ if "all_data" in st.session_state:
         # st.text(str(grid_response))
         selected_df = pd.DataFrame(grid_response['selected_rows'])
         st.dataframe(selected_df)
-        st.text(selected_df.columns)
+        # st.text(selected_df.columns)
         selected_rows_data = grid_response['selected_rows']
 
         prompt= """Please go over the following search arbitrage ideas, i want u to group these kws to remove repeating ones, like if u see rent to own vehicles no deposit AND cars rent to own no deposit group them into a concise 1 term like :'rent to own vehicles no deposit'
@@ -431,7 +431,8 @@ if "all_data" in st.session_state:
 
 
 
-                        """ + selected_df[['Keyword','Index']]
+                        """ + selected_df[['Keyword']]
+        st.text(prompt)
         group_res = gemini_text_lib(prompt)
         st.text(group_res)
 
