@@ -483,6 +483,7 @@ if st.session_state.get("trigger_process") and "selected_rows" in st.session_sta
             indices = group.get("indices", [])
             idea = group.get("idea", "")
             group_rows = selected_df.iloc[indices]
+            kws = "\n".join(group_rows["Keyword"].tolist())
             total_volume = group_rows["Search Volume"].sum() or 1
 
             def weighted_avg(col):
@@ -497,6 +498,7 @@ if st.session_state.get("trigger_process") and "selected_rows" in st.session_sta
                 "Weighted Avg High Bid ($)": weighted_avg("High Bid ($)"),
                 "Weighted Avg Quantitative Index": weighted_avg("Quantitative Index"),
                 "Sum Search Volume Diff": group_rows.get("Search Volume Diff", pd.Series()).sum(),
+                "KWs" : kws
             })
 
         agg_df = pd.DataFrame(agg_results)
