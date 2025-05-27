@@ -417,6 +417,12 @@ if "all_data" in st.session_state:
     gb.configure_column("Search Volume", sort="desc")
 
     grid_options = gb.build()
+    grid_options['paginationPageSize'] = 50
+    grid_options['pagination'] = True
+    grid_options['paginationAutoPageSize'] = False
+    grid_options['paginationPageSizeOptions'] = [10, 20, 50, 100, 200,400,,500,600,700,800,900,1000,2000]  # 👈 Here are your presets
+    grid_options['suppressPaginationPanel'] = False  # Must be False to show the dropdown
+
     grid_response = AgGrid(all_data, gridOptions=grid_options, height=800, width=700, theme="streamlit",update_mode='SELECTION_CHANGED')
     if st.button("proccess!"):
         selected_df = pd.DataFrame(grid_response['selected_rows']).reset_index()
