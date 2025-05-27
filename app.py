@@ -1,6 +1,6 @@
 import streamlit as st
 st.set_page_config(layout="wide")
-
+import random
 import google.ads.googleads
 import requests
 from google.ads.googleads.client import GoogleAdsClient
@@ -8,6 +8,8 @@ from google.ads.googleads.errors import GoogleAdsException
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 import time
+from google import genai
+
 from st_aggrid import AgGrid, GridOptionsBuilder
 # from nltk.corpus import stopwords
 # from nltk.tokenize import word_tokenize
@@ -32,7 +34,7 @@ CUSTOMER_ID = st.secrets["google_ads"]["CUSTOMER_ID"]
 
 GPT_API_KEY = st.secrets["google_ads"]["GPT_API_KEY"]
 
-
+GEMINI_API_KEYS= st.secrets["google_ads"]["GEMINI_API_KEY"]
 
 
 # Full list of locations (Country Name -> Location ID)
@@ -133,7 +135,35 @@ def fetch_keyword_data(keyword, location_id, language_id , network):
     except:
         time.sleep(1)
 
-
+def gemini_text_lib(prompt, model='gemini-2.5-pro-exp-03-25',max_retries=5): # Using a stable model  
+    tries = 0
+    while tries < max_retries:
+        
+        st.text(f"Gemini working.. {model} trial {tries+1}")
+        """ Calls Gemini API, handling potential list of keys """
+        if not GEMINI_API_KEYS:
+            st.error("Gemini API keys not available.")
+            return None
+    
+        # If multiple keys, choose one randomly; otherwise use the configured one (if single) or the first.
+        selected_key = random.choice(GEMINI_API_KEYS)
+    
+        client = genai.Client(api_key=selected_key)
+    
+    
+        try:
+            response = client.models.generate_content(
+                model=model, contents=  prompt
+            )
+            st.text(str(response))
+    
+            return response.text
+        except Exception as e:
+            st.text('gemini_text_lib error ' + str(e)) 
+            time.sleep(15)
+            tries += 1
+    
+    return None
 def get_network_delta(df):
     # Step 1: Normalize the keywords
     df['Keyword'] = df['Keyword'].str.strip().str.lower()
@@ -392,13 +422,27 @@ if "all_data" in st.session_state:
         selected_rows_data = grid_response['selected_rows']
 
 
+        group_res = gemini_text_lib("""Please go over the following search arbitrage ideas, i want u to group these kws to remove repeating ones, like if u see rent to own vehicles no deposit AND cars rent to own no deposit group them into a concise 1 term like :'rent to own vehicles no deposit'
+                        
+                        im going to provied you with table 2 col : idea , indecies
+
+                        i want u to group the ideas and reurn json of idea and list of indecies,
+                        [{idea:"idea1...", indices:[list_of_indices]},{idea:"idea2...", indices:[list_of_indices]}...]
 
 
-    if selected_rows_data:
-        # AgGrid(selected_rows_data,gridOptions=grid_options, height=800, width=700, theme="streamlit")
-        selected_df = pd.DataFrame(selected_rows_data)
 
-        st.dataframe(selected_df)
+                        """)
+        st.text(group_res)
+
+
+
+
+
+    # if selected_rows_data:
+    #     # AgGrid(selected_rows_data,gridOptions=grid_options, height=800, width=700, theme="streamlit")
+    #     selected_df = pd.DataFrame(selected_rows_data)
+
+    #     st.dataframe(selected_df)
 
 
     # if enable_aggregation:
