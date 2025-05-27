@@ -435,7 +435,14 @@ if "all_data" in st.session_state:
     grid_options['suppressPaginationPanel'] = False  # Must be False to show the dropdown
 
     grid_response = AgGrid(all_data, gridOptions=grid_options, height=800, width=700, theme="streamlit",update_mode='SELECTION_CHANGED')
+
     if st.button("proccess!"):
+        st.session_state["trigger_process"] = True
+        st.session_state["selected_rows"] = grid_response['selected_rows']
+
+    if st.session_state.get("trigger_process") and "selected_rows" in st.session_state:
+        st.session_state["trigger_process"] = False
+
         selected_df = pd.DataFrame(grid_response['selected_rows']).reset_index()
         if selected_df.empty:
             st.warning("Please select at least one row.")
