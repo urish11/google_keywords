@@ -432,7 +432,7 @@ if "all_data" in st.session_state:
                         im going to provied you with table 2 col : idea , indecies
 
                         i want u to group the ideas and reurn json of idea and list of indecies,
-                        [{idea:"idea1...", indices:[list_of_indices]},{idea:"idea2...", indices:[list_of_indices]}...]
+                        [{idea:'idea1...', indices:[list_of_indices]},{idea:'idea2...', indices:[list_of_indices]}...]
 
 
 
