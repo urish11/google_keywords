@@ -376,7 +376,7 @@ if "all_data" in st.session_state:
     suppressMenu=True,            # No menu for this column
     width=15                      # Adjust width
 )
-
+ 
     gb.configure_grid_options(clipboard=True)  # Enable clipboard copy
     gb.configure_column("Search Volume", sort="desc")
 
