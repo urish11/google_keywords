@@ -368,13 +368,13 @@ if "all_data" in st.session_state:
     gb.configure_grid_options(enableRangeSelection=True,rowSelection="multiple")  # Enable range selection
     gb.configure_grid_options(pagination=True, paginationPageSize=50, paginationAutoPageSize=False, paginationMode="client")
     gb.configure_column(
-    "checkbox_col",  # A dummy column name, AgGrid will create it
+    "Selection",  # A dummy column name, AgGrid will create it
     headerCheckboxSelection=True,  # Checkbox in the header for "select all"
     checkboxSelection=True,       # Checkbox for each row
     pinned="left",                # Pin to the left for visibility
     lockPosition=True,            # Prevent moving it
     suppressMenu=True,            # No menu for this column
-    width=50                      # Adjust width
+    width=15                      # Adjust width
 )
 
     gb.configure_grid_options(clipboard=True)  # Enable clipboard copy
