@@ -410,14 +410,15 @@ if "all_data" in st.session_state:
 #     suppressMenu=True,            # No menu for this column
 #     width=5                      # Adjust width
 # )
- 
+    page_size = st.selectbox("Rows per page", [10, 20, 50, 100, 200, 500, 1000], index=3)
+
     gb.configure_grid_options(clipboard=True)  # Enable clipboard copy
     gb.configure_selection(selection_mode='multiple', use_checkbox=True)
 
     gb.configure_column("Search Volume", sort="desc")
 
     grid_options = gb.build()
-    grid_options['paginationPageSize'] = 250
+    grid_options['paginationPageSize'] = page_size
     grid_options['pagination'] = True
     grid_options['paginationAutoPageSize'] = False
     grid_options['domLayout'] = 'autoHeight'
