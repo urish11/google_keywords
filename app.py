@@ -437,9 +437,10 @@ if "all_data" in st.session_state:
 
 
                         """ + subset.to_csv()
-        st.text(prompt)
-        group_res = gemini_text_lib(prompt)
-        st.text(group_res)
+        with st.expander("prompt"):
+            st.text(prompt) 
+            group_res = gemini_text_lib(prompt)
+            st.text(group_res)
 
 
 
