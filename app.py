@@ -381,15 +381,19 @@ if "all_data" in st.session_state:
     gb.configure_column("Search Volume", sort="desc")
 
     grid_options = gb.build()
-    grid_response = AgGrid(all_data, gridOptions=grid_options, height=800, width=700, theme="streamlit")
+    grid_response = AgGrid(all_data, gridOptions=grid_options, height=800, width=700, theme="streamlit",update_mode='SELECTION_CHANGED')
 
     if st.button("proccess!"):
 
-        selected_rows_data = grid_response
+        selected_rows_data = grid_response['sel']
+
 
 
     if selected_rows_data:
-        AgGrid(selected_rows_data,gridOptions=grid_options, height=800, width=700, theme="streamlit")
+        # AgGrid(selected_rows_data,gridOptions=grid_options, height=800, width=700, theme="streamlit")
+        selected_df = pd.DataFrame(selected_rows_data)
+
+        st.dataframe(selected_df)
 
 
     # if enable_aggregation:
