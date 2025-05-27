@@ -385,7 +385,7 @@ if "all_data" in st.session_state:
 
     if st.button("proccess!"):
 
-        selected_rows_data = grid_response["sel"] 
+        selected_rows_data = grid_response
 
         # AgGrid(selected_rows_data,gridOptions=grid_options, height=800, width=700, theme="streamlit")
 
