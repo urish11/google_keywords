@@ -458,7 +458,7 @@ if "all_data" in st.session_state:
 
         # Loop over groups and calculate aggregate metrics
         for group in grouped_ideas:
-            st.text(group)
+            # st.text(group)
             indices = group.get("indices", [])
             idea = group.get("idea", "")
             group_rows = selected_df.iloc[indices]
