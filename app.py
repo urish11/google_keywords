@@ -374,7 +374,7 @@ if "all_data" in st.session_state:
     pinned="left",                # Pin to the left for visibility
     lockPosition=True,            # Prevent moving it
     suppressMenu=True,            # No menu for this column
-    width=15                      # Adjust width
+    width=5                      # Adjust width
 )
  
     gb.configure_grid_options(clipboard=True)  # Enable clipboard copy
