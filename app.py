@@ -368,7 +368,7 @@ if "all_data" in st.session_state:
     gb.configure_grid_options(enableRangeSelection=True,rowSelection="multiple")  # Enable range selection
     gb.configure_grid_options(pagination=True, paginationPageSize=50, paginationAutoPageSize=False, paginationMode="client")
     gb.configure_column(
-    "s",  # A dummy column name, AgGrid will create it
+    "sel",  # A dummy column name, AgGrid will create it
     headerCheckboxSelection=True,  # Checkbox in the header for "select all"
     checkboxSelection=True,       # Checkbox for each row
     pinned="left",                # Pin to the left for visibility
@@ -385,7 +385,7 @@ if "all_data" in st.session_state:
 
     if st.button("proccess!"):
 
-        selected_rows_data = grid_response['s'] 
+        selected_rows_data = grid_response["sel"] 
 
         # AgGrid(selected_rows_data,gridOptions=grid_options, height=800, width=700, theme="streamlit")
 
