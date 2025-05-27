@@ -135,7 +135,7 @@ def fetch_keyword_data(keyword, location_id, language_id , network):
     except:
         time.sleep(1)
 
-def gemini_text_lib(prompt, model='gemini-2.5-pro-exp-03-25',max_retries=5): # Using a stable model  
+def gemini_text_lib(prompt, model="gemini-2.5-flash-preview-04-17",max_retries=5): # Using a stable model  
     tries = 0
     while tries < max_retries:
         
