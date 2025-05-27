@@ -107,9 +107,13 @@ def fetch_keyword_data(keyword, location_id, language_id , network):
         elif network == "GOOGLE_SEARCH":
             request.keyword_plan_network = client.enums.KeywordPlanNetworkEnum.GOOGLE_SEARCH
         
-        keyword_seed = client.get_type("KeywordSeed")
-        keyword_seed.keywords.extend(keyword)
-        request.keyword_seed = keyword_seed
+        # keyword_seed = client.get_type("KeywordSeed")
+        # keyword_seed.keywords.extend(keyword)
+        # request.keyword_seed = keyword_seed
+
+        url_seed = client.get_type("UrlSeed")
+        url_seed.url.extend("https://searchlabz.com/motorcycle-payment-plans-with-no-credit-check-en/")
+        request.url_seed= url_seed
 
         response = keyword_plan_idea_service.generate_keyword_ideas(request=request)
         # st.text(str(response))
@@ -329,7 +333,7 @@ st.title("Google Ads Keyword Ideas with Quantitative Index")
 
 selected_location = st.selectbox("Select Location:", options=list(locations.keys()), format_func=lambda x: locations[x])
 selected_language = st.selectbox("Select Language:", options=list(languages.keys()), format_func=lambda x: languages[x])
-keywords_input = st.text_area("Enter a list of keywords (one per line):",height=300)
+keywords_input = st.text_area("Enter a list of keywords (one per line):",height=300,)
  
 st.write("### Set Weights for Quantitative Index")
 weight_volume = st.slider("Weight for Search Volume", 0.0, 1.0, 0.5)
