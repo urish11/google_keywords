@@ -423,7 +423,7 @@ if "all_data" in st.session_state:
         selected_df = pd.DataFrame(grid_response['selected_rows'])
         selected_df = selected_df.reset_index()
         st.dataframe(selected_df)
-        # st.text(selected_df.columns)
+        st.text(selected_df.columns)
         # selected_rows_data = grid_response['selected_rows']
         subset = pd.DataFrame({
                                     # 'index': selected_df.index,
