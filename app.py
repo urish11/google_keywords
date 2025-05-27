@@ -417,7 +417,7 @@ if "all_data" in st.session_state:
     gb.configure_column("Search Volume", sort="desc")
 
     grid_options = gb.build()
-    grid_options['paginationPageSize'] = 50
+    grid_options['paginationPageSize'] = 250
     grid_options['pagination'] = True
     grid_options['paginationAutoPageSize'] = False
     grid_options['domLayout'] = 'autoHeight'
