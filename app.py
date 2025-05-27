@@ -422,7 +422,7 @@ if "all_data" in st.session_state:
         # st.text(selected_df.columns)
         # selected_rows_data = grid_response['selected_rows']
         subset = pd.DataFrame({
-                                    'index': selected_df.index,
+                                    # 'index': selected_df.index,
                                     'name': selected_df['Keyword']
                                 })
 
