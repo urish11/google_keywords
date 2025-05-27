@@ -436,69 +436,69 @@ if "all_data" in st.session_state:
 
     grid_response = AgGrid(all_data, gridOptions=grid_options, height=800, width=700, theme="streamlit",update_mode='SELECTION_CHANGED')
 
-    if st.button("proccess!"):
-        st.session_state["trigger_process"] = True
-        st.session_state["selected_rows"] = grid_response['selected_rows']
+if st.button("Proccess!"):
+    st.session_state["trigger_process"] = True
+    st.session_state["selected_rows"] = grid_response['selected_rows']
 
-    if st.session_state.get("trigger_process") and "selected_rows" in st.session_state:
-        st.session_state["trigger_process"] = False
+if st.session_state.get("trigger_process") and "selected_rows" in st.session_state:
+    st.session_state["trigger_process"] = False
 
-        selected_df = pd.DataFrame(grid_response['selected_rows']).reset_index()
-        if selected_df.empty:
-            st.warning("Please select at least one row.")
-        else:
-            st.dataframe(selected_df)
+    selected_df = pd.DataFrame(grid_response['selected_rows']).reset_index()
+    if selected_df.empty:
+        st.warning("Please select at least one row.")
+    else:
+        st.dataframe(selected_df)
 
-            subset = pd.DataFrame({'name': selected_df['Keyword']})
-            st.text(subset)
+        subset = pd.DataFrame({'name': selected_df['Keyword']})
+        st.text(subset)
 
-            prompt= """Please go over the following search arbitrage ideas, i want u to group these kws to remove repeating ones, like if u see rent to own vehicles no deposit AND cars rent to own no deposit group them into a concise 1 term like :'rent to own vehicles no deposit'
-                                    
-                                    group close keywords that would yield same search results on google like :["rent to own homes near me","rent to own homes","cheap rent to own houses near me"] are 1 group for example (ehrn write new groupd idea text dont use special chars !)
-                                    im going to provied you with table 2 col : idea , indecies
+        prompt= """Please go over the following search arbitrage ideas, i want u to group these kws to remove repeating ones, like if u see rent to own vehicles no deposit AND cars rent to own no deposit group them into a concise 1 term like :'rent to own vehicles no deposit'
+                                
+                                group close keywords that would yield same search results on google like :["rent to own homes near me","rent to own homes","cheap rent to own houses near me"] are 1 group for example (ehrn write new groupd idea text dont use special chars !)
+                                im going to provied you with table 2 col : idea , indecies
 
-                                    i want u to group the ideas and reurn json of idea and list of indecies,
-                                    [{idea:'idea1...', indices:[list_of_indices]},{idea:'idea2...', indices:[list_of_indices]}...]
+                                i want u to group the ideas and reurn json of idea and list of indecies,
+                                [{idea:'idea1...', indices:[list_of_indices]},{idea:'idea2...', indices:[list_of_indices]}...]
 
-                                    no intros no extra JUST the json
+                                no intros no extra JUST the json
 
 
-                                    """ + subset.to_csv()
-            with st.status("Processing prompt..."):
-                st.text(prompt)
-                group_res = gemini_text_lib(prompt).replace("```json","").replace("```","")
-                st.text(group_res)
+                                """ + subset.to_csv()
+        with st.status("Processing prompt..."):
+            st.text(prompt)
+            group_res = gemini_text_lib(prompt).replace("```json","").replace("```","")
+            st.text(group_res)
 
-            try:
-                grouped_ideas = json.loads(group_res)
-            except json.JSONDecodeError as e:
-                st.error("Failed to parse JSON from Gemini output.")
-                st.stop()
+        try:
+            grouped_ideas = json.loads(group_res)
+        except json.JSONDecodeError as e:
+            st.error("Failed to parse JSON from Gemini output.")
+            st.stop()
 
-            agg_results = []
-            for group in grouped_ideas:
-                indices = group.get("indices", [])
-                idea = group.get("idea", "")
-                group_rows = selected_df.iloc[indices]
-                total_volume = group_rows["Search Volume"].sum() or 1
+        agg_results = []
+        for group in grouped_ideas:
+            indices = group.get("indices", [])
+            idea = group.get("idea", "")
+            group_rows = selected_df.iloc[indices]
+            total_volume = group_rows["Search Volume"].sum() or 1
 
-                def weighted_avg(col):
-                    return (group_rows[col] * group_rows["Search Volume"]).sum() / total_volume
+            def weighted_avg(col):
+                return (group_rows[col] * group_rows["Search Volume"]).sum() / total_volume
 
-                agg_results.append({
-                    "Grouped Idea": idea,
-                    "Count": len(group_rows),
-                    "Total Search Volume": group_rows["Search Volume"].sum(),
-                    "Weighted Avg Competition Index": weighted_avg("Competition Index"),
-                    "Weighted Avg Low Bid ($)": weighted_avg("Low Bid ($)"),
-                    "Weighted Avg High Bid ($)": weighted_avg("High Bid ($)"),
-                    "Weighted Avg Quantitative Index": weighted_avg("Quantitative Index"),
-                    "Sum Search Volume Diff": group_rows.get("Search Volume Diff", pd.Series()).sum(),
-                })
+            agg_results.append({
+                "Grouped Idea": idea,
+                "Count": len(group_rows),
+                "Total Search Volume": group_rows["Search Volume"].sum(),
+                "Weighted Avg Competition Index": weighted_avg("Competition Index"),
+                "Weighted Avg Low Bid ($)": weighted_avg("Low Bid ($)"),
+                "Weighted Avg High Bid ($)": weighted_avg("High Bid ($)"),
+                "Weighted Avg Quantitative Index": weighted_avg("Quantitative Index"),
+                "Sum Search Volume Diff": group_rows.get("Search Volume Diff", pd.Series()).sum(),
+            })
 
-            agg_df = pd.DataFrame(agg_results)
-            st.write("### Aggregated Grouped Ideas (Weighted by Search Volume)")
-            st.dataframe(agg_df)
+        agg_df = pd.DataFrame(agg_results)
+        st.write("### Aggregated Grouped Ideas (Weighted by Search Volume)")
+        st.dataframe(agg_df)
 
 
     # if selected_rows_data:
