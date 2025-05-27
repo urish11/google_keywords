@@ -35,7 +35,7 @@ CUSTOMER_ID = st.secrets["google_ads"]["CUSTOMER_ID"]
 GPT_API_KEY = st.secrets["google_ads"]["GPT_API_KEY"]
 
 GEMINI_API_KEYS= st.secrets["google_ads"]["GEMINI_API_KEY"]
-
+agg_df= None
 
 # Full list of locations (Country Name -> Location ID)
 locations = {
