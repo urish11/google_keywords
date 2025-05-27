@@ -365,38 +365,44 @@ if "all_data" in st.session_state:
     gb.configure_pagination(enabled=True,paginationPageSize=50)
     gb.configure_default_column(filterable=True, sortable=True, editable=True)
     gb.configure_column("Keyword", filter=True)
-    gb.configure_grid_options(enableRangeSelection=True)  # Enable range selection
+    gb.configure_grid_options(enableRangeSelection=True,rowSelection=True)  # Enable range selection
     gb.configure_grid_options(pagination=True, paginationPageSize=50, paginationAutoPageSize=False, paginationMode="client")
 
     gb.configure_grid_options(clipboard=True)  # Enable clipboard copy
     gb.configure_column("Search Volume", sort="desc")
 
     grid_options = gb.build()
-    AgGrid(all_data, gridOptions=grid_options, height=800, width=700, theme="streamlit")
+    grid_response = AgGrid(all_data, gridOptions=grid_options, height=800, width=700, theme="streamlit")
 
-    if enable_aggregation:
-        # Perform Dynamic Clustering
-        cluster_data = dynamic_keyword_clustering(all_data["Keyword"].tolist(), ngram_range=(2, 3), eps=0.6, min_samples=2)
+    if st.button("proccess!"):
 
-        # Aggregate Data by Clusters
-        aggregated_table = aggregate_by_cluster(all_data, cluster_data)
-
-        # Display Aggregated Table
-        st.write("### Aggregated Table (By Key Phrase)")
-        gb = GridOptionsBuilder.from_dataframe(aggregated_table)
-        gb.configure_pagination(enabled=True,paginationPageSize=100)
-        gb.configure_default_column(filterable=True, sortable=True, editable=False)
-        gb.configure_column("Keyword", filter=True)
-        gb.configure_grid_options(enableRangeSelection=True)  # Enable range selection
-        gb.configure_grid_options(pagination=True, paginationPageSize=50, paginationAutoPageSize=False, paginationMode="client")
-
-        gb.configure_grid_options(clipboard=True)  # Enable clipboard copy
-        gb.configure_column("Total_Search_Volume", sort="desc")
+        AgGrid(selected_rows_data = grid_response['selected_rows'],gridOptions=grid_options, height=800, width=700, theme="streamlit")
 
 
 
-        grid_options = gb.build()
-        AgGrid(aggregated_table, gridOptions=grid_options, height=800, width=700, theme="streamlit")
+    # if enable_aggregation:
+    #     # Perform Dynamic Clustering
+    #     cluster_data = dynamic_keyword_clustering(all_data["Keyword"].tolist(), ngram_range=(2, 3), eps=0.6, min_samples=2)
+
+    #     # Aggregate Data by Clusters
+    #     aggregated_table = aggregate_by_cluster(all_data, cluster_data)
+
+    #     # Display Aggregated Table
+    #     st.write("### Aggregated Table (By Key Phrase)")
+    #     gb = GridOptionsBuilder.from_dataframe(aggregated_table)
+    #     gb.configure_pagination(enabled=True,paginationPageSize=100)
+    #     gb.configure_default_column(filterable=True, sortable=True, editable=False)
+    #     gb.configure_column("Keyword", filter=True)
+    #     gb.configure_grid_options(enableRangeSelection=True)  # Enable range selection
+    #     gb.configure_grid_options(pagination=True, paginationPageSize=50, paginationAutoPageSize=False, paginationMode="client")
+
+    #     gb.configure_grid_options(clipboard=True)  # Enable clipboard copy
+    #     gb.configure_column("Total_Search_Volume", sort="desc")
+
+
+
+    #     grid_options = gb.build()
+    #     AgGrid(aggregated_table, gridOptions=grid_options, height=800, width=700, theme="streamlit")
 
     # Download Button for Original Table
     csv = all_data.to_csv(index=False).encode("utf-8")
@@ -406,10 +412,10 @@ if "all_data" in st.session_state:
         file_name="keyword_ideas.csv",
         mime="text/csv",
     )
-    # csv_cluster = aggregated_table.to_csv(index=False).encode("utf-8")
-    st.download_button(
-        label="Download aggregated_table  CSV",
-        data=csv,
-        file_name="keyword_ideas_agg.csv",
-        mime="text/csv",
-    )
+    # # csv_cluster = aggregated_table.to_csv(index=False).encode("utf-8")
+    # st.download_button(
+    #     label="Download aggregated_table  CSV",
+    #     data=csv,
+    #     file_name="keyword_ideas_agg.csv",
+    #     mime="text/csv",
+    # )
