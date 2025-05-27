@@ -385,10 +385,10 @@ if "all_data" in st.session_state:
 
     if st.button("proccess!"):
 
-        selected_rows_data = grid_response['s']== True
+        selected_rows_data = grid_response['s'] == True
 
-        AgGrid(selected_rows_data,gridOptions=grid_options, height=800, width=700, theme="streamlit")
-
+        # AgGrid(selected_rows_data,gridOptions=grid_options, height=800, width=700, theme="streamlit")
+        st.data_editor(selected_rows_data)
 
 
     # if enable_aggregation:
