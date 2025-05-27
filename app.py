@@ -387,6 +387,8 @@ if "all_data" in st.session_state:
 
     if st.button("proccess!"):
 
+        st.dataframe(pd.DataFrame(grid_response))
+
         selected_rows_data = grid_response['selected_rows']
 
 
