@@ -401,6 +401,8 @@ if "all_data" in st.session_state:
     gb.configure_column("Keyword", filter=True)
     gb.configure_grid_options(enableRangeSelection=True,rowSelection="multiple")  # Enable range selection
     gb.configure_grid_options(pagination=True, paginationPageSize=50, paginationAutoPageSize=False, paginationMode="client")
+    gb.configure_column("Search Volume Diff", type="numberColumnFilter", precision=0)
+
 #     gb.configure_column(
 #     "sel",  # A dummy column name, AgGrid will create it
 #     headerCheckboxSelection=True,  # Checkbox in the header for "select all"
