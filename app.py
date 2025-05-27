@@ -418,7 +418,7 @@ if "all_data" in st.session_state:
     if st.checkbox("proccess!"):
         # st.text(str(grid_response))
         selected_df = pd.DataFrame(grid_response['selected_rows'])
-        selected_df.reset_index()
+        selected_df = selected_df.reset_index()
         st.dataframe(selected_df)
         # st.text(selected_df.columns)
         # selected_rows_data = grid_response['selected_rows']
