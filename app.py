@@ -418,6 +418,7 @@ if "all_data" in st.session_state:
     if st.checkbox("proccess!"):
         # st.text(str(grid_response))
         selected_df = pd.DataFrame(grid_response['selected_rows'])
+        selected_df.reset_index()
         st.dataframe(selected_df)
         # st.text(selected_df.columns)
         # selected_rows_data = grid_response['selected_rows']
@@ -434,6 +435,7 @@ if "all_data" in st.session_state:
                         i want u to group the ideas and reurn json of idea and list of indecies,
                         [{idea:'idea1...', indices:[list_of_indices]},{idea:'idea2...', indices:[list_of_indices]}...]
 
+                        no intros no extra JUST the json
 
 
                         """ + subset.to_csv()
