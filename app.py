@@ -430,6 +430,7 @@ if "all_data" in st.session_state:
 
         prompt= """Please go over the following search arbitrage ideas, i want u to group these kws to remove repeating ones, like if u see rent to own vehicles no deposit AND cars rent to own no deposit group them into a concise 1 term like :'rent to own vehicles no deposit'
                         
+                        group close kws that would yield same search results on google
                         im going to provied you with table 2 col : idea , indecies
 
                         i want u to group the ideas and reurn json of idea and list of indecies,
