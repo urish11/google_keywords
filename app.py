@@ -422,8 +422,7 @@ if "all_data" in st.session_state:
 
         selected_rows_data = grid_response['selected_rows']
 
-
-        group_res = gemini_text_lib("""Please go over the following search arbitrage ideas, i want u to group these kws to remove repeating ones, like if u see rent to own vehicles no deposit AND cars rent to own no deposit group them into a concise 1 term like :'rent to own vehicles no deposit'
+        prompt= """Please go over the following search arbitrage ideas, i want u to group these kws to remove repeating ones, like if u see rent to own vehicles no deposit AND cars rent to own no deposit group them into a concise 1 term like :'rent to own vehicles no deposit'
                         
                         im going to provied you with table 2 col : idea , indecies
 
@@ -432,7 +431,8 @@ if "all_data" in st.session_state:
 
 
 
-                        """) + selected_df[['Keyword','index']]
+                        """ + selected_df[['Keyword','Index']]
+        group_res = gemini_text_lib(prompt)
         st.text(group_res)
 
 
