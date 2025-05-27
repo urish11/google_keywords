@@ -387,10 +387,9 @@ if "all_data" in st.session_state:
 
         selected_rows_data = grid_response
 
-        # AgGrid(selected_rows_data,gridOptions=grid_options, height=800, width=700, theme="streamlit")
 
     if selected_rows_data:
-        st.data_editor(selected_rows_data)
+        AgGrid(selected_rows_data,gridOptions=grid_options, height=800, width=700, theme="streamlit")
 
 
     # if enable_aggregation:
