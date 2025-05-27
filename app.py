@@ -418,6 +418,12 @@ if "all_data" in st.session_state:
     gb.configure_selection(selection_mode='multiple', use_checkbox=True)
 
     gb.configure_column("Search Volume", sort="desc")
+    gb.configure_column(
+    field="Keyword",
+    headerCheckboxSelection=True,     # Select all checkbox in header
+    checkboxSelection=True            # Checkboxes per row
+)
+
 
     grid_options = gb.build()
     grid_options['paginationPageSize'] = page_size
