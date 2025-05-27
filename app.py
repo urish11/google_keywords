@@ -9,11 +9,11 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 import time
 from st_aggrid import AgGrid, GridOptionsBuilder
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.cluster import DBSCAN
-import nltk
+# from nltk.corpus import stopwords
+# from nltk.tokenize import word_tokenize
+# from sklearn.feature_extraction.text import TfidfVectorizer
+# from sklearn.cluster import DBSCAN
+# import nltk
 import numpy as np
 from collections import Counter
 
