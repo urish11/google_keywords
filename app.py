@@ -17,10 +17,10 @@ from st_aggrid import AgGrid, GridOptionsBuilder
 import numpy as np
 from collections import Counter
 
-# Ensure NLTK dependencies are downloaded
-nltk.download('punkt')
-nltk.download('stopwords')
-nltk.download('punkt_tab')
+# # Ensure NLTK dependencies are downloaded
+# nltk.download('punkt')
+# nltk.download('stopwords')
+# nltk.download('punkt_tab')
 
 # Google Ads API credentials (use st.secrets for sensitive data)
 CLIENT_ID = st.secrets["google_ads"]["CLIENT_ID"]
