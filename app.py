@@ -386,8 +386,8 @@ if "all_data" in st.session_state:
     grid_response = AgGrid(all_data, gridOptions=grid_options, height=800, width=700, theme="streamlit",update_mode='SELECTION_CHANGED')
 
     if st.checkbox("proccess!"):
-        st.text(str(grid_response))
-        st.dataframe(pd.DataFrame(grid_response))
+        # st.text(str(grid_response))
+        st.dataframe(pd.DataFrame(grid_response['selected_rows']))
 
         selected_rows_data = grid_response['selected_rows']
 
