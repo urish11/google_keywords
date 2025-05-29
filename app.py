@@ -399,6 +399,7 @@ if "all_data" in st.session_state:
     gb = GridOptionsBuilder.from_dataframe(all_data)
     gb.configure_pagination(enabled=True,paginationPageSize=50)
     gb.configure_default_column(filterable=True, sortable=True, editable=True)
+    gb.configure_column("Network", filter=True)
     gb.configure_column("Keyword", filter=True)
     gb.configure_grid_options(enableRangeSelection=True,rowSelection="multiple")  # Enable range selection
     gb.configure_grid_options(pagination=True, paginationPageSize=50, paginationAutoPageSize=False, paginationMode="client")
