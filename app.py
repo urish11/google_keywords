@@ -201,7 +201,7 @@ def calculate_quantitative_index(df, weight_volume, weight_competition, weight_b
     df["Quantitative Index"] = (
         normalized_df["Normalized Search Volume"] * weight_volume +
         normalized_df["Normalized Competition Index"] * weight_competition +
-        np.log10(normalized_df["Normalized Low Bid ($)"]   ) * weight_bids
+        np.log10(normalized_df["Normalized Low Bid ($)"] +1  ) * weight_bids
     )
 
     df["Quantitative Index"] = df["Quantitative Index"].round(2)
