@@ -18,7 +18,7 @@ from st_aggrid import AgGrid, GridOptionsBuilder
 # import nltk
 import numpy as np
 from collections import Counter
-
+import math
 # # Ensure NLTK dependencies are downloaded
 # nltk.download('punkt')
 # nltk.download('stopwords')
@@ -201,7 +201,7 @@ def calculate_quantitative_index(df, weight_volume, weight_competition, weight_b
     df["Quantitative Index"] = (
         normalized_df["Normalized Search Volume"] * weight_volume +
         normalized_df["Normalized Competition Index"] * weight_competition +
-        normalized_df["Normalized Low Bid ($)"] * weight_bids
+        np.log10(normalized_df["Normalized Low Bid ($)"] * weight_bids )
     )
 
     df["Quantitative Index"] = df["Quantitative Index"].round(2)
