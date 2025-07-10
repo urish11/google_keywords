@@ -443,7 +443,7 @@ if "all_data" in st.session_state:
 
 
     csv = all_data.to_csv(index=False).encode('utf-8')
-    st.download_button("Download CSV", csv, "data.csv", "text/csv")
+    st.download_button("Download CSV", csv, "data.csv", "text/csv") 
 
 if st.button("Proccess!"):
     st.session_state["trigger_process"] = True
