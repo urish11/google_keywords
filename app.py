@@ -23,7 +23,7 @@ import math
 # nltk.download('punkt')
 # nltk.download('stopwords')
 # nltk.download('punkt_tab')
-
+ 
 # Google Ads API credentials (use st.secrets for sensitive data)
 CLIENT_ID = st.secrets["google_ads"]["CLIENT_ID"]
 CLIENT_SECRET = st.secrets["google_ads"]["CLIENT_SECRET"]
