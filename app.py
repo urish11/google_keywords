@@ -58,6 +58,17 @@ languages = {
     1110: "Punjabi", 1130: "Tamil", 1131: "Telugu"
 }
 
+
+client = GoogleAdsClient.load_from_dict({
+    "developer_token": DEVELOPER_TOKEN,
+    "client_id": CLIENT_ID,
+    "client_secret": CLIENT_SECRET,
+    "refresh_token": REFRESH_TOKEN,
+    "login_customer_id": LOGIN_CUSTOMER_ID,
+    "use_proto_plus": True
+})
+month_enum = client.enums.MonthOfYearEnum
+
 def chatGPT(prompt, model="gpt-4o", temperature=1.0) :
     st.write("Generating image description...")
     headers = {
@@ -72,19 +83,34 @@ def chatGPT(prompt, model="gpt-4o", temperature=1.0) :
     response = requests.post('https://api.openai.com/v1/chat/completions', headers=headers, json=data)
     content = response.json()['choices'][0]['message']['content'].strip()
     return  content
+def month_number_to_google_enum(month_number, month_enum):
+    return {
+        1: month_enum.JANUARY,
+        2: month_enum.FEBRUARY,
+        3: month_enum.MARCH,
+        4: month_enum.APRIL,
+        5: month_enum.MAY,
+        6: month_enum.JUNE,
+        7: month_enum.JULY,
+        8: month_enum.AUGUST,
+        9: month_enum.SEPTEMBER,
+        10: month_enum.OCTOBER,
+        11: month_enum.NOVEMBER,
+        12: month_enum.DECEMBER,
+    }[month_number]
 
 def fetch_keyword_data(keyword, location_id, language_id , network):
     try:
 
         
-        client = GoogleAdsClient.load_from_dict({
-            "developer_token": DEVELOPER_TOKEN,
-            "client_id": CLIENT_ID,
-            "client_secret": CLIENT_SECRET,
-            "refresh_token": REFRESH_TOKEN,
-            "login_customer_id": LOGIN_CUSTOMER_ID,
-            "use_proto_plus": True
-        })
+        # client = GoogleAdsClient.load_from_dict({
+        #     "developer_token": DEVELOPER_TOKEN,
+        #     "client_id": CLIENT_ID,
+        #     "client_secret": CLIENT_SECRET,
+        #     "refresh_token": REFRESH_TOKEN,
+        #     "login_customer_id": LOGIN_CUSTOMER_ID,
+        #     "use_proto_plus": True
+        # })
 
         keyword_plan_idea_service = client.get_service("KeywordPlanIdeaService")
 
@@ -99,6 +125,16 @@ def fetch_keyword_data(keyword, location_id, language_id , network):
         language.language_constant = f"languageConstants/{language_id}"
         request.language = language.language_constant
 
+
+
+        start_month_enum = month_number_to_google_enum(start_month, month_enum)
+        end_month_enum = month_number_to_google_enum(end_month, month_enum)
+
+        year_month_range = request.historical_metrics_options.year_month_range
+        year_month_range.start.year = start_year
+        year_month_range.start.month = start_month_enum
+        year_month_range.end.year = end_year
+        year_month_range.end.month = end_month_enum
 
         # network = client.get_type("KeywordPlanNetwork")
         # network.network_constant = f"KeywordPlanNetwork/GOOGLE_SEARCH"
@@ -344,6 +380,18 @@ enable_aggregation = st.checkbox("Enable Dynamic Keyword Aggregation", value=Tru
 enable_gpt_kws = st.checkbox("Add KWs via chatGPT?", value=False)
 if enable_gpt_kws:
     count_gpt_kws = st.number_input('How Many GPT KWs?',value = 20)
+years = list(range(2019, 2026))
+months = list(range(1, 13))
+
+col1, col2 = st.columns(2)
+
+with col1:
+    start_year = st.selectbox("Start Year", years, index=years.index(2024))
+    start_month = st.selectbox("Start Month", months, index=0)
+
+with col2:
+    end_year = st.selectbox("End Year", years, index=years.index(2024))
+    end_month = st.selectbox("End Month", months, index=2)
 
 
 
