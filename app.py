@@ -158,9 +158,12 @@ def fetch_keyword_data(keyword, location_id, language_id , network):
         for idea in response.results:
             metrics = idea.keyword_idea_metrics
             if metrics.avg_monthly_searches > 0 and (metrics.low_top_of_page_bid_micros > 0 ):  # Exclude rows with Search Volume == 0
+                search_volume_sum = sum( m.monthly_searches for m in metrics.monthly_search_volumes if (m.year > start_year or (m.year == start_year and m.month >= start_month_enum)) 
+                                        and (m.year < end_year or (m.year == end_year and m.month <= end_month_enum)) )
                 keywords_data.append({
                     "Keyword": idea.text,
-                    "Search Volume": metrics.monthly_search_volumes[-1].monthly_searches,
+                    # "Search Volume": metrics.monthly_search_volumes[-1].monthly_searches,
+                    "Search Volume": search_volume_sum,
                     "Competition Index": round(metrics.competition_index, 2),
                     "Low Bid ($)": round(metrics.low_top_of_page_bid_micros / 1_000_000 / ils_usd, 2),
                     "High Bid ($)": round(metrics.high_top_of_page_bid_micros / 1_000_000 / ils_usd, 2),
