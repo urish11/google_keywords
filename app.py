@@ -386,11 +386,11 @@ months = list(range(1, 13))
 col1, col2 = st.columns(2)
 
 with col1:
-    start_year = st.selectbox("Start Year", years, index=years.index(2024))
+    start_year = st.selectbox("Start Year", years, index=years.index(2025))
     start_month = st.selectbox("Start Month", months, index=0)
 
 with col2:
-    end_year = st.selectbox("End Year", years, index=years.index(2024))
+    end_year = st.selectbox("End Year", years, index=years.index(2025))
     end_month = st.selectbox("End Month", months, index=2)
 
 
