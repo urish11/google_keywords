@@ -441,6 +441,10 @@ if "all_data" in st.session_state:
 
     grid_response = AgGrid(all_data, gridOptions=grid_options, height=800, width=700, theme="streamlit",update_mode='SELECTION_CHANGED')
 
+
+    csv = all_data.to_csv(index=False).encode('utf-8')
+    st.download_button("Download CSV", csv, "data.csv", "text/csv")
+
 if st.button("Proccess!"):
     st.session_state["trigger_process"] = True
     st.session_state["selected_rows"] = grid_response['selected_rows']
