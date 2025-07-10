@@ -383,7 +383,7 @@ if enable_gpt_kws:
 years = list(range(2019, 2026))
 months = list(range(1, 13))
 
-col1, col2 = st.columns(2)
+col1, col2 = st.columns(5)
 
 with col1:
     start_year = st.selectbox("Start Year", years, index=years.index(2025))
