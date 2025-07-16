@@ -86,7 +86,7 @@ def chatGPT(prompt, model="gpt-4o", temperature=1.0) :
     return  content
 
 
-def claude(prompt , model = "claude-sonnet-4-20250514	", temperature=0.87 , is_thinking = False, max_retries = 10): # claude-3-7-sonnet-latest
+def claude(prompt , model = "claude-sonnet-4-20250514", temperature=0.87 , is_thinking = False, max_retries = 10): # claude-3-7-sonnet-latest
     # if is_pd_policy_global : prompt +=   PREDICT_POLICY
     tries = 0
     st.text(f"Using model: {model}")
