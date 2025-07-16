@@ -484,7 +484,7 @@ if st.button("Fetch Keyword Ideas"):
             gpt_kws = chatGPT(f"write more {str(count_gpt_kws)} diverse and divergent (CONCISE AS POSSIBLE)! keywords (not nesseacrly containg original) for search arb with high intent and high CPC, return JUST THE PLAIN TXT the new keywords each spereted with  no bullit points no list of numbers just the kws spereated by \n for: {keywords_input} in the same language as input")
             keywords = keywords + gpt_kws.split("\n")
         elif new_but_diff_kws : 
-            keywords = claude(f"""give me new simillar  but diff new ideas kws like \n {'\n'.join(keywords)} \n\n 
+            keywords = claude(f"""give me new simillar  but diff new ideas kws like \n {chr(92) + 'n'.join(keywords)} \n\n 
              Return same format, no intros just pure data\n {round(new_but_diff_kws_count*len(keywords) ,-1)} rows""").split('\n')
 
             
