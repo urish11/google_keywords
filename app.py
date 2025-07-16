@@ -486,7 +486,10 @@ if st.button("Fetch Keyword Ideas"):
         elif new_but_diff_kws : 
             keywords = claude(f"""give me new simillar  but diff new ideas kws like \n {chr(92) + 'n'.join(keywords)} \n\n 
              Return same format, no intros just pure data\n {round(new_but_diff_kws_count*len(keywords) ,-1)} rows""").split('\n')
-
+            with st.expander("New KWs from Claude"):
+                st.text(keywords)
+             
+   
             
         
 
