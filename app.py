@@ -90,7 +90,7 @@ def claude(prompt , model = "claude-sonnet-4-20250514	", temperature=0.87 , is_t
     # if is_pd_policy_global : prompt +=   PREDICT_POLICY
     tries = 0
     st.text(f"Using model: {model}")
-    st.text(prompt)
+    # st.text(prompt)
     while tries < max_retries:
         try:
         
@@ -98,7 +98,7 @@ def claude(prompt , model = "claude-sonnet-4-20250514	", temperature=0.87 , is_t
         
             client = anthropic.Anthropic(
             # defaults to os.environ.get("ANTHROPIC_API_KEY")
-            api_key=st.secrets["ANTHROPIC_API_KEY"])
+            api_key=st.secrets["google_ads"]["ANTHROPIC_API_KEY"])
         
             if is_thinking == False:
                     
