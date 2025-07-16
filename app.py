@@ -11,6 +11,7 @@ import time
 from google import genai
 import json
 from st_aggrid import AgGrid, GridOptionsBuilder
+from datetime import datetime
 # from nltk.corpus import stopwords
 # from nltk.tokenize import word_tokenize
 # from sklearn.feature_extraction.text import TfidfVectorizer
@@ -465,12 +466,12 @@ months = list(range(1, 13))
 col1, col2 ,_,_,_= st.columns(5)
 
 with col1:
-    start_year = st.selectbox("Start Year", years, index=years.index(2025))
-    start_month = st.selectbox("Start Month", months, index=0)
+    start_year = st.selectbox("Start Year", years, index=years.index(datetime.now().date().year))
+    start_month = st.selectbox("Start Month", months, index=datetime.now().date().month-2)
 
 with col2:
     end_year = st.selectbox("End Year", years, index=years.index(2025))
-    end_month = st.selectbox("End Month", months, index=2)
+    end_month = st.selectbox("End Month", months, index=datetime.now().date().month)
 
 
 
@@ -484,10 +485,10 @@ if st.button("Fetch Keyword Ideas"):
             gpt_kws = chatGPT(f"write more {str(count_gpt_kws)} diverse and divergent (CONCISE AS POSSIBLE)! keywords (not nesseacrly containg original) for search arb with high intent and high CPC, return JUST THE PLAIN TXT the new keywords each spereted with  no bullit points no list of numbers just the kws spereated by \n for: {keywords_input} in the same language as input")
             keywords = keywords + gpt_kws.split("\n")
         elif new_but_diff_kws : 
-            keywords = claude(f"""give me new simillar  but diff new ideas kws like \n {chr(92) + 'n'.join(keywords)} \n\n 
+            keywords = claude(f"""give me new simillar  but diff new ideas concise no duplicates kws like \n {chr(92) + 'n'.join(keywords)} \n\n 
              Return same format, no intros just pure data\n {round(new_but_diff_kws_count*len(keywords) ,-1)} rows""").split('\n')
             with st.expander("New KWs from Claude"):
-                st.text(keywords)
+                st.text('\n'.join(keywords))
              
    
             
@@ -496,34 +497,36 @@ if st.button("Fetch Keyword Ideas"):
         if not keywords:
             st.error("Please enter at least one keyword.")
         else:
-            all_data = pd.DataFrame()
-            st.text("going to google")
-            n_of_chunks =len(keywords)// 20 + 1
-            if len(keywords) < 20 : n_of_chunks=1
-            # n_of_chunks= len(keywords)
+            with st.expander("AdPlanner Log"):
+                all_data = pd.DataFrame()
+                st.text("going to google")
+                n_of_chunks =len(keywords)// 20 + 1
+                if len(keywords) < 20 : n_of_chunks=1
+                # n_of_chunks= len(keywords)
 
-            st.text(type(keywords))
-            chunks = np.array_split(np.array(keywords),n_of_chunks  )
+                st.text(type(keywords))
+                chunks = np.array_split(np.array(keywords),n_of_chunks  )
 
-            for chunk in chunks:
-                chunk = list(chunk.tolist())
-                st.text(chunk)
-                for network in ["GOOGLE_SEARCH_AND_PARTNERS", "GOOGLE_SEARCH"]:
-                    data = fetch_keyword_data(chunk, selected_location, selected_language,network)
-                    time.sleep(1)
+                for chunk in chunks:
+                    chunk = list(chunk.tolist())
+                    st.text(chunk)
+                    for network in ["GOOGLE_SEARCH_AND_PARTNERS", "GOOGLE_SEARCH"]:
+                        data = fetch_keyword_data(chunk, selected_location, selected_language,network)
+                        time.sleep(1)
 
-                    all_data = pd.concat([all_data, data], ignore_index=True)
+                        all_data = pd.concat([all_data, data], ignore_index=True)
 
-                st.text(f"Total len {len(all_data)}")
-            st.text("done")
-            # st.text(all_data)
-            all_data = get_network_delta(all_data)
+                    st.text(f"Total len {len(all_data)}")
+                st.text("done")
+                # st.text(all_data)
+                all_data = get_network_delta(all_data)
 
-            if not all_data.empty:
-                all_data = calculate_quantitative_index(all_data, weight_volume, weight_competition, weight_bids)
-                all_data = all_data.drop_duplicates()
-                all_data = all_data[all_data["Keyword"].str.count(" ") >=2]
-                st.session_state["all_data"] = all_data
+                if not all_data.empty:
+                    all_data = calculate_quantitative_index(all_data, weight_volume, weight_competition, weight_bids)
+                    all_data = all_data.drop_duplicates()
+                    all_data = all_data[all_data["Keyword"].str.count(" ") >=2]
+                    all_data =all_data.sort_index(axis="Search Volume Diff")
+                    st.session_state["all_data"] = all_data
 
 if "all_data" in st.session_state:
     all_data = st.session_state["all_data"]
