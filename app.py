@@ -19,6 +19,7 @@ from st_aggrid import AgGrid, GridOptionsBuilder
 import numpy as np
 from collections import Counter
 import math
+import anthropic
 # # Ensure NLTK dependencies are downloaded
 # nltk.download('punkt')
 # nltk.download('stopwords')
@@ -83,6 +84,77 @@ def chatGPT(prompt, model="gpt-4o", temperature=1.0) :
     response = requests.post('https://api.openai.com/v1/chat/completions', headers=headers, json=data)
     content = response.json()['choices'][0]['message']['content'].strip()
     return  content
+
+
+def claude(prompt , model = "claude-sonnet-4-20250514	", temperature=0.87 , is_thinking = False, max_retries = 10): # claude-3-7-sonnet-latest
+    # if is_pd_policy_global : prompt +=   PREDICT_POLICY
+    tries = 0
+    st.text(f"Using model: {model}")
+    st.text(prompt)
+    while tries < max_retries:
+        try:
+        
+        
+        
+            client = anthropic.Anthropic(
+            # defaults to os.environ.get("ANTHROPIC_API_KEY")
+            api_key=st.secrets["ANTHROPIC_API_KEY"])
+        
+            if is_thinking == False:
+                    
+                message = client.messages.create(
+                    
+                model=model,
+                max_tokens=20000,
+                temperature=temperature,
+                
+                top_p= 0.8,
+
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": prompt
+                            }
+                        ]
+                    }
+                ]
+            )
+                return message.content[0].text
+            if is_thinking == True:
+                message = client.messages.create(
+                    
+                model=model,
+                max_tokens=20000,
+                temperature=temperature,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": prompt
+                            }
+                        ]
+                    }
+                ],
+                thinking = { "type": "enabled",
+                "budget_tokens": 16000}
+            )
+                return message.content[1].text
+        
+        
+        
+            print(message)
+            return message.content[0].text
+
+        except Exception as e:
+            st.text(e)
+            tries += 1 
+            time.sleep(5)
+
 def month_number_to_google_enum(month_number, month_enum):
     return {
         1: month_enum.JANUARY,
@@ -381,8 +453,12 @@ weight_bids = st.slider("Weight for Average Bid", 0.0, 1.0, 0.2)
 
 enable_aggregation = st.checkbox("Enable Dynamic Keyword Aggregation", value=True)
 enable_gpt_kws = st.checkbox("Add KWs via chatGPT?", value=False)
+new_but_diff_kws = st.checkbox("New but different KWs via Claude?", value=False)
 if enable_gpt_kws:
     count_gpt_kws = st.number_input('How Many GPT KWs?',value = 20)
+
+if new_but_diff_kws:
+    new_but_diff_kws_count = st.number_input('How Many new KWs factor?',value = 3)
 years = list(range(2019, 2026))
 months = list(range(1, 13))
 
@@ -407,6 +483,9 @@ if st.button("Fetch Keyword Ideas"):
         if enable_gpt_kws:
             gpt_kws = chatGPT(f"write more {str(count_gpt_kws)} diverse and divergent (CONCISE AS POSSIBLE)! keywords (not nesseacrly containg original) for search arb with high intent and high CPC, return JUST THE PLAIN TXT the new keywords each spereted with  no bullit points no list of numbers just the kws spereated by \n for: {keywords_input} in the same language as input")
             keywords = keywords + gpt_kws.split("\n")
+        elif new_but_diff_kws : 
+            keywords = claude(f"give me new simillar  but diff new ideas kws like \n {\n.join(keywords)} \n\n 
+             Return same format, no intros just pure data\n {round(new_but_diff_kws_count*len(keywords) ,-1} rows").split("\n")
 
             
         
