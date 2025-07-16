@@ -467,11 +467,11 @@ col1, col2 ,_,_,_= st.columns(5)
 
 with col1:
     start_year = st.selectbox("Start Year", years, index=years.index(datetime.now().date().year))
-    start_month = st.selectbox("Start Month", months, index=datetime.now().date().month-2)
+    start_month = st.selectbox("Start Month", months, index=datetime.now().date().month-3)
 
 with col2:
     end_year = st.selectbox("End Year", years, index=years.index(2025))
-    end_month = st.selectbox("End Month", months, index=datetime.now().date().month)
+    end_month = st.selectbox("End Month", months, index=datetime.now().date().month-1)
 
 
 
@@ -485,7 +485,7 @@ if st.button("Fetch Keyword Ideas"):
             gpt_kws = chatGPT(f"write more {str(count_gpt_kws)} diverse and divergent (CONCISE AS POSSIBLE)! keywords (not nesseacrly containg original) for search arb with high intent and high CPC, return JUST THE PLAIN TXT the new keywords each spereted with  no bullit points no list of numbers just the kws spereated by \n for: {keywords_input} in the same language as input")
             keywords = keywords + gpt_kws.split("\n")
         elif new_but_diff_kws : 
-            keywords = claude(f"""give me new simillar  but diff new ideas concise no duplicates kws like \n {chr(92) + 'n'.join(keywords)} \n\n 
+            keywords = claude(f"""give me new simillar  but DIFFERENT new ideas not synonyms concise no duplicates kws like \n {chr(92) + 'n'.join(keywords)} \n\n 
              Return same format, no intros just pure data\n {round(new_but_diff_kws_count*len(keywords) ,-1)} rows""").split('\n')
             with st.expander("New KWs from Claude"):
                 st.text('\n'.join(keywords))
