@@ -525,7 +525,7 @@ if st.button("Fetch Keyword Ideas"):
                     all_data = calculate_quantitative_index(all_data, weight_volume, weight_competition, weight_bids)
                     all_data = all_data.drop_duplicates()
                     all_data = all_data[all_data["Keyword"].str.count(" ") >=2]
-                    all_data =all_data.sort_index(axis="Search Volume Diff")
+                    all_data =all_data.sort_value(by="Search Volume Diff")
                     st.session_state["all_data"] = all_data
 
 if "all_data" in st.session_state:
