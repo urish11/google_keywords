@@ -205,8 +205,17 @@ def ads_semantic_cloud_bfs(
 
     # --- BFS over idea graph ---
     from sentence_transformers import SentenceTransformer
-    model = SentenceTransformer("all-MiniLM-L6-v2", device="cpu")
+    import torch
+    def load_sbert():
+        # Force load on CPU without meta tensors
+        torch.set_default_device("cpu")
+        return SentenceTransformer(
+            "all-MiniLM-L6-v2",
+            device="cpu",
+            trust_remote_code=True
+        )
 
+    model = load_sbert()
 
     seen = set()          # text seen (lowercased)
     seen_sigs = []        # trigram signatures for near-dup blocking
