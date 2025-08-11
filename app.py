@@ -803,6 +803,8 @@ if st.button("Fetch Keyword Ideas"):
                 st.text("done")
                 # st.text(all_data)
                 all_data = get_network_delta(all_data)
+                if enable_semantic_cloud:
+                    all_data = all_data[["Search Volume Diff"] > 0 ]
 
                 if not all_data.empty:
                     all_data = calculate_quantitative_index(all_data, weight_volume, weight_competition, weight_bids)
