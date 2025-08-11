@@ -760,7 +760,7 @@ if st.button("Fetch Keyword Ideas"):
                 st.text('\n'.join(keywords))
         elif enable_semantic_cloud:
             keywords= ads_semantic_cloud_bfs(client,
-                                   keywords,
+                                   seeds=keywords,
                                    target_n=semantic_cloud_count)
    
             
