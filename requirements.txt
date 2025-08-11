@@ -7,4 +7,4 @@ nltk
 streamlit_modal
 google-genai
 anthropic
-sentence_transformers
+sentence-transformers
