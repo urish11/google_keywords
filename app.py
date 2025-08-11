@@ -508,7 +508,7 @@ if st.button("Fetch Keyword Ideas"):
                 chunks = np.array_split(np.array(keywords),n_of_chunks  )
 
                 for chunk_n, chunk in enumerate(chunks):
-                    st.text(f"chunk {chunk_n} out of {n_of_chunks}")
+                    st.text(f"chunk {chunk_n+1} out of {n_of_chunks}")
                     chunk = list(chunk.tolist())
                     st.text(chunk)
                     for network in ["GOOGLE_SEARCH_AND_PARTNERS", "GOOGLE_SEARCH"]:
