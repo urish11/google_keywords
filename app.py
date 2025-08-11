@@ -9,6 +9,8 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 import time
 from google import genai
+import  re
+from collections import deque
 import json
 from st_aggrid import AgGrid, GridOptionsBuilder
 from datetime import datetime
@@ -70,6 +72,269 @@ client = GoogleAdsClient.load_from_dict({
     "use_proto_plus": True
 })
 month_enum = client.enums.MonthOfYearEnum
+
+
+
+
+def ads_semantic_cloud_bfs(
+    client,
+    *,
+    seeds=None,                 # list[str] or None
+    url_seed=None,              # e.g. "https://www.medicare.gov" (optional)
+    site_seed=None,             # e.g. "https://en.wikipedia.org" (optional)
+    location_id=2376,           # Israel by your map; change as needed
+    language_id=1000,           # English by your map; change as needed
+    target_n=3000,
+    max_rounds=8,
+    per_round_limit=600,        # max new phrases per round (after MMR)
+    network="GOOGLE_SEARCH_AND_PARTNERS",
+    start_year=2024, start_month=1, end_year=2025, end_month=8,
+    mmr_lambda=0.65,            # relevance vs diversity
+    dedup_jaccard=0.90,         # trigram near-dup cutoff
+    sleep_s=0.6,                # be nice to the API
+    return_new_only=True,
+    debug=True,
+):
+    """
+    Expand seeds by walking the Google Ads idea graph (no token invention).
+    • Works with seeds OR url/site seed (zero-seed).
+    • Selects diverse, high-value ideas via MMR.
+    • Stops when we have target_n unique phrases.
+    """
+    def trigram_sig(s: str):
+        s = " " + re.sub(r"\s+", " ", s.strip().lower()) + " "
+        return {s[i:i+3] for i in range(len(s)-2)}
+
+    def jacc(a, b):
+        if not a or not b: return 0.0
+        u = len(a | b)
+        return (len(a & b) / u) if u else 0.0
+
+    def score_metric(m):
+        # you can tune these weights; this favors volume + bid
+        vol = m.get("Search Volume", 0)
+        bid = (m.get("Low Bid ($)", 0) + m.get("High Bid ($)", 0)) * 0.5
+        comp = m.get("Competition Index", 0.0)  # 0..100-ish in your code
+        return math.log1p(vol) * (1.0 + 0.15*comp) * (1.0 + 0.35*bid)
+
+    def embed(model, texts):
+        # small helper to embed in batches
+        V = model.encode(texts, normalize_embeddings=True, show_progress_bar=False)
+        V = np.array(V, dtype=np.float32)
+        if V.ndim == 1: V = V.reshape(1, -1)
+        return V
+
+    # --- build idea fetcher using your existing client/env ---
+    month_enum = client.enums.MonthOfYearEnum
+    def month_number_to_google_enum(month_number):
+        return {
+            1: month_enum.JANUARY, 2: month_enum.FEBRUARY, 3: month_enum.MARCH,
+            4: month_enum.APRIL, 5: month_enum.MAY, 6: month_enum.JUNE,
+            7: month_enum.JULY, 8: month_enum.AUGUST, 9: month_enum.SEPTEMBER,
+            10: month_enum.OCTOBER, 11: month_enum.NOVEMBER, 12: month_enum.DECEMBER,
+        }[month_number]
+
+    kpisvc = client.get_service("KeywordPlanIdeaService")
+
+    def fetch_ideas(seed_keywords=None, url=None, site=None):
+        request = client.get_type("GenerateKeywordIdeasRequest")
+        request.customer_id = str(client.login_customer_id) if hasattr(client, "login_customer_id") else ""  # safe
+        geo_target = client.get_type("LocationInfo")
+        geo_target.geo_target_constant = f"geoTargetConstants/{location_id}"
+        request.geo_target_constants.append(geo_target.geo_target_constant)
+
+        lang = client.get_type("LanguageInfo")
+        lang.language_constant = f"languageConstants/{language_id}"
+        request.language = lang.language_constant
+
+        if network == "GOOGLE_SEARCH_AND_PARTNERS":
+            request.keyword_plan_network = client.enums.KeywordPlanNetworkEnum.GOOGLE_SEARCH_AND_PARTNERS
+        else:
+            request.keyword_plan_network = client.enums.KeywordPlanNetworkEnum.GOOGLE_SEARCH
+
+        # date window (so volume sums are consistent)
+        yr = request.historical_metrics_options.year_month_range
+        yr.start.year = start_year
+        yr.start.month = month_number_to_google_enum(start_month)
+        yr.end.year = end_year
+        yr.end.month = month_number_to_google_enum(end_month)
+
+        any_seed = False
+        if seed_keywords:
+            ks = client.get_type("KeywordSeed")
+            ks.keywords.extend(seed_keywords)
+            request.keyword_seed = ks
+            any_seed = True
+        if url:
+            us = client.get_type("UrlSeed")
+            us.url = url
+            request.url_seed = us
+            any_seed = True
+        if site:
+            ss = client.get_type("SiteSeed")
+            ss.site = site
+            request.site_seed = ss
+            any_seed = True
+
+        if not any_seed:
+            return []
+
+        resp = kpisvc.generate_keyword_ideas(request=request)
+        out = []
+        ils_usd = 3.6  # your conversion in code
+        for r in resp.results:
+            m = r.keyword_idea_metrics
+            if not m or m.avg_monthly_searches <= 0:
+                continue
+            # sum volume over the chosen range
+            sv = 0
+            for mv in m.monthly_search_volumes:
+                if (mv.year > start_year or (mv.year == start_year and mv.month >= month_number_to_google_enum(start_month))) \
+                   and (mv.year < end_year or (mv.year == end_year and mv.month <= month_number_to_google_enum(end_month))):
+                    sv += mv.monthly_searches
+            if sv <= 0: 
+                continue
+            out.append({
+                "Keyword": r.text,
+                "Search Volume": sv,
+                "Competition Index": float(getattr(m, "competition_index", 0.0)),
+                "Low Bid ($)": round(m.low_top_of_page_bid_micros / 1_000_000 / ils_usd, 2) if m.low_top_of_page_bid_micros else 0.0,
+                "High Bid ($)": round(m.high_top_of_page_bid_micros / 1_000_000 / ils_usd, 2) if m.high_top_of_page_bid_micros else 0.0,
+            })
+        return out
+
+    # --- BFS over idea graph ---
+    from sentence_transformers import SentenceTransformer
+    model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")  # fast & fine for MMR gating
+
+    seen = set()          # text seen (lowercased)
+    seen_sigs = []        # trigram signatures for near-dup blocking
+    results = []          # accepted list
+    frontier = deque()
+
+    # seed frontier
+    seeds = [s.strip() for s in (seeds or []) if s.strip()]
+    if seeds:
+        for s in seeds:
+            lc = s.lower()
+            if lc not in seen:
+                seen.add(lc)
+                frontier.append(s)
+    else:
+        # Zero-seed: use a neutral URL or your own site/category page
+        # (You can pass url_seed/site_seed when calling)
+        pass
+
+    # also enqueue url/site seed “symbolically”
+    special_seed_marker = "__URL_OR_SITE__"
+    if url_seed or site_seed:
+        frontier.append(special_seed_marker)
+
+    # pre-embed dynamic “out” store for MMR novelty
+    out_vecs = np.zeros((0, 384), dtype=np.float32)  # MiniLM-L6 out dim
+
+    round_idx = 0
+    while len(results) < target_n and round_idx < max_rounds and frontier:
+        round_idx += 1
+        bucket = []
+        # pull up to ~100 “parent” seeds this round
+        parents = []
+        while frontier and len(parents) < 100:
+            p = frontier.popleft()
+            parents.append(p)
+
+        # fetch ideas for parents in chunks
+        for p in parents:
+            try:
+                if p == special_seed_marker:
+                    ideas = fetch_ideas(seed_keywords=None, url=url_seed, site=site_seed)
+                else:
+                    ideas = fetch_ideas(seed_keywords=[p], url=None, site=None)
+            except Exception as e:
+                if debug: print("fetch error:", e)
+                ideas = []
+            time.sleep(sleep_s)
+            for item in ideas:
+                kw = re.sub(r"\s+", " ", item["Keyword"].strip().lower())
+                if not kw or len(kw.split()) < 2 or len(kw.split()) > 12:
+                    continue
+                # near-dup check
+                sig = trigram_sig(kw)
+                too_close = any(jacc(sig, s) >= dedup_jaccard for s in seen_sigs)
+                if kw in seen or too_close:
+                    continue
+                item["_score"] = score_metric(item)
+                item["_kw"] = kw
+                item["_sig"] = sig
+                bucket.append(item)
+
+        if not bucket:
+            if debug: print(f"[round {round_idx}] no new ideas")
+            continue
+
+        # rank by score, keep a workable top-k
+        bucket.sort(key=lambda x: x["_score"], reverse=True)
+        top = bucket[: max(per_round_limit * 4, 2000)]  # big candidate set
+
+        # MMR select to enforce diversity
+        cand_texts = [x["_kw"] for x in top]
+        cand_vecs  = embed(model, cand_texts)
+        base_vec   = embed(model, [" ".join(parents[:8]) or (seeds[0] if seeds else "topic")])[0]  # a soft “center”
+        if out_vecs.shape[0] == 0:
+            rel = (cand_vecs @ base_vec.reshape(-1,1)).ravel()
+            order = np.argsort(-rel)[:per_round_limit]
+        else:
+            rel = (cand_vecs @ base_vec.reshape(-1,1)).ravel()
+            nov = (cand_vecs @ out_vecs.T)
+            max_nov = nov.max(axis=1) if nov.size else np.zeros(len(cand_vecs))
+            scores = mmr_lambda * rel - (1.0 - mmr_lambda) * max_nov
+            order = np.argsort(-scores)[:per_round_limit]
+
+        picked = [top[i] for i in order]
+
+        # accept, update novelty pool & frontier
+        new_texts = []
+        for x in picked:
+            kw = x["_kw"]
+            if kw in seen:
+                continue
+            seen.add(kw)
+            seen_sigs.append(x["_sig"])
+            results.append(kw)
+            new_texts.append(kw)
+            frontier.append(kw)  # feed back as next-round parents
+            if len(results) >= target_n:
+                break
+
+        if new_texts:
+            V = embed(model, new_texts)
+            out_vecs = np.vstack([out_vecs, V])
+
+        if debug:
+            print(f"[round {round_idx}] parents={len(parents)} bucket={len(bucket)} accepted={len(new_texts)} total={len(results)}")
+
+        if not frontier:
+            # safety: if we ran out of frontier but still under target, seed with top few again
+            frontier.extend(results[-min(200, len(results)):])
+
+    return results[:target_n]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def chatGPT(prompt, model="gpt-4o", temperature=1.0) :
     st.write("Generating image description...")
@@ -455,11 +720,15 @@ weight_bids = st.slider("Weight for Average Bid", 0.0, 1.0, 0.2)
 enable_aggregation = st.checkbox("Enable Dynamic Keyword Aggregation", value=True)
 enable_gpt_kws = st.checkbox("Add KWs via chatGPT?", value=False)
 new_but_diff_kws = st.checkbox("New but different KWs via Claude?", value=False)
+enable_semantic_cloud = st.checkbox("enable_semantic_cloud?", value=False)
 if enable_gpt_kws:
     count_gpt_kws = st.number_input('How Many GPT KWs?',value = 20)
 
 if new_but_diff_kws:
     new_but_diff_kws_count = st.number_input('How Many new KWs factor?',value = 3)
+if enable_semantic_cloud:
+    semantic_cloud_count = st.number_input('How Many new KWs for semantic cloud?',value = 3)
+
 years = list(range(2019, 2026))
 months = list(range(1, 13))
 
@@ -489,7 +758,10 @@ if st.button("Fetch Keyword Ideas"):
              Return same format, no intros just pure data\n {round(new_but_diff_kws_count*len(keywords) ,-1)} rows""").split('\n')
             with st.expander("New KWs from Claude"):
                 st.text('\n'.join(keywords))
-             
+        elif enable_semantic_cloud:
+            keywords= ads_semantic_cloud_bfs(client,
+                                   keywords,
+                                   target_n=semantic_cloud_count)
    
             
         
