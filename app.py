@@ -504,10 +504,11 @@ if st.button("Fetch Keyword Ideas"):
                 if len(keywords) < 20 : n_of_chunks=1
                 # n_of_chunks= len(keywords)
 
-                st.text(type(keywords))
+               
                 chunks = np.array_split(np.array(keywords),n_of_chunks  )
 
-                for chunk in chunks:
+                for chunk_n, chunk in enumerate(chunks):
+                    st.text(f"chunk {chunk_n} out of {n_of_chunks}")
                     chunk = list(chunk.tolist())
                     st.text(chunk)
                     for network in ["GOOGLE_SEARCH_AND_PARTNERS", "GOOGLE_SEARCH"]:
