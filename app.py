@@ -205,7 +205,8 @@ def ads_semantic_cloud_bfs(
 
     # --- BFS over idea graph ---
     from sentence_transformers import SentenceTransformer
-    model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2",device="cpu"   )  # fast & fine for MMR gating
+    model = SentenceTransformer("all-MiniLM-L6-v2", device="cpu")
+
 
     seen = set()          # text seen (lowercased)
     seen_sigs = []        # trigram signatures for near-dup blocking
